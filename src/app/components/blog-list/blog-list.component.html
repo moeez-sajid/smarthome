@@ -1,0 +1,96 @@
+<div class="blog-list-container">
+  <!-- Top Ad Space -->
+  <div class="ad-container ad-top">
+    <div class="ad-placeholder">
+      <span>Ad Space</span>
+      <p>Google AdSense Banner (728×90)</p>
+    </div>
+  </div>
+
+  <div class="blog-list-header">
+    <div class="blog-count">
+      <span>Showing {{ blogs.length }} of {{ paginationInfo.totalItems }} articles</span>
+    </div>
+    <div class="pagination-controls">
+      <label for="items-per-page">Items per page:</label>
+      <select 
+        id="items-per-page" 
+        [(ngModel)]="paginationInfo.itemsPerPage"
+        (change)="onItemsPerPageChange($event)"
+      >
+        <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="blog-grid">
+    <div *ngFor="let blog of blogs" class="blog-card">
+      <div class="blog-category">{{ blog.category }}</div>
+      <h2 class="blog-title">{{ blog.title }}</h2>
+      <div class="blog-date">{{ formatDate(blog.publishDate) }}</div>
+      <p class="blog-excerpt">{{ blog.content }}</p>
+      <a [routerLink]="['/blog', blog.slug]" class="read-more">Read More</a>
+    </div>
+  </div>
+  
+  <div *ngIf="blogs.length === 0" class="no-results">
+    <h3>No articles found</h3>
+    <p>Try a different category or date range.</p>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="paginationInfo.totalPages > 1">
+    <button 
+      class="page-button prev" 
+      [disabled]="paginationInfo.currentPage === 1"
+      (click)="onPageChange(paginationInfo.currentPage - 1)"
+    >
+      Previous
+    </button>
+    
+    <button 
+      *ngIf="paginationInfo.currentPage > 3" 
+      class="page-button"
+      (click)="onPageChange(1)"
+    >
+      1
+    </button>
+    
+    <span *ngIf="paginationInfo.currentPage > 3" class="ellipsis">...</span>
+    
+    <button 
+      *ngFor="let page of getPageNumbers()" 
+      class="page-button" 
+      [class.active]="page === paginationInfo.currentPage"
+      (click)="onPageChange(page)"
+    >
+      {{ page }}
+    </button>
+    
+    <span *ngIf="paginationInfo.currentPage < paginationInfo.totalPages - 2" class="ellipsis">...</span>
+    
+    <button 
+      *ngIf="paginationInfo.currentPage < paginationInfo.totalPages - 2" 
+      class="page-button"
+      (click)="onPageChange(paginationInfo.totalPages)"
+    >
+      {{ paginationInfo.totalPages }}
+    </button>
+    
+    <button 
+      class="page-button next" 
+      [disabled]="paginationInfo.currentPage === paginationInfo.totalPages"
+      (click)="onPageChange(paginationInfo.currentPage + 1)"
+    >
+      Next
+    </button>
+  </div>
+  
+  <!-- Bottom Ad Space (Moved from sidebar) -->
+  <div class="ad-container ad-bottom">
+    <div class="ad-placeholder">
+      <span>Ad Space</span>
+      <p>Google AdSense Banner (728×250)</p>
+    </div>
+  </div>
+</div>

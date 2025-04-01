@@ -1,0 +1,59 @@
+<div class="side-nav">
+  <div class="categories-section">
+    <div class="header">
+      <h3>Categories</h3>
+      <button class="expand-btn" (click)="toggleExpand()">
+        <svg [class.expanded]="isExpanded" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <div class="categories-list" [class.expanded]="isExpanded">
+      <button 
+        *ngFor="let category of categories" 
+        [class.active]="selectedCategory === category"
+        (click)="selectCategory(category)"
+      >
+        {{ category }}
+      </button>
+      <button 
+        class="view-all" 
+        [class.active]="selectedCategory === null"
+        (click)="selectCategory(null)"
+      >
+        View All
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <h3>Filters</h3>
+    <div class="date-filter">
+      <div class="date-input">
+        <label>From:</label>
+        <input 
+          type="date" 
+          [ngModel]="startDate" 
+          (ngModelChange)="startDate = $event; onDateFilterChange()"
+        >
+      </div>
+      <div class="date-input">
+        <label>To:</label>
+        <input 
+          type="date" 
+          [ngModel]="endDate" 
+          (ngModelChange)="endDate = $event; onDateFilterChange()"
+        >
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sidenav Ad Space -->
+  <div class="ad-container">
+    <div class="ad-placeholder">
+      <span>Ad Space</span>
+      <p>Google AdSense (250×250)</p>
+    </div>
+  </div>
+</div>

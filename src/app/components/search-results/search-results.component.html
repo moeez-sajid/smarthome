@@ -1,0 +1,89 @@
+<div class="search-results-container">
+  <div class="search-header">
+    <h1>Search Results for "{{ searchQuery }}"</h1>
+    <div class="search-info">
+      <p *ngIf="totalItems > 0">Found {{ totalItems }} articles</p>
+      <p *ngIf="totalItems === 0">No results found for "{{ searchQuery }}"</p>
+    </div>
+    <div class="search-actions">
+      <button class="clear-search" (click)="clearSearch()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Clear Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Searching for "{{ searchQuery }}"...</p>
+  </div>
+
+  <!-- Results list -->
+  <div class="search-results-list" *ngIf="!isLoading && searchResults.length > 0">
+    <div class="result-card" *ngFor="let blog of searchResults">
+      <div *ngIf="blog.headerImage" class="result-image">
+        <img [src]="blog.headerImage" [alt]="blog.title">
+      </div>
+      <div class="result-content">
+        <div class="result-meta">
+          <span class="result-category">{{ blog.category }}</span>
+          <span class="result-date">{{ blog.publishDate | date:'MMM d, yyyy' }}</span>
+        </div>
+        <h2 class="result-title">{{ blog.title }}</h2>
+        <p class="result-description">{{ blog.description }}</p>
+        <div class="result-tags" *ngIf="blog.tags && blog.tags.length > 0">
+          <span class="tag" *ngFor="let tag of blog.tags">#{{ tag }}</span>
+        </div>
+        <a [routerLink]="['/blog', blog.slug]" class="result-link">Read Article</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- No results -->
+  <div class="no-results" *ngIf="!isLoading && searchResults.length === 0">
+    <div class="no-results-content">
+      <h2>No search results found</h2>
+      <p>We couldn't find any articles matching "{{ searchQuery }}".</p>
+      <div class="search-suggestions">
+        <h3>Suggestions:</h3>
+        <ul>
+          <li>Check the spelling of your search term</li>
+          <li>Try using fewer or different keywords</li>
+          <li>Try browsing by categories instead</li>
+        </ul>
+        <a [routerLink]="['/blogs']" class="browse-all">Browse All Articles</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && totalItems > itemsPerPage">
+    <button 
+      class="page-button prev" 
+      [disabled]="currentPage === 1"
+      (click)="onPageChange(currentPage - 1)"
+      aria-label="Previous page"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    
+    <span class="page-info">Page {{ currentPage }} of {{ Math.ceil(totalItems / itemsPerPage) }}</span>
+    
+    <button 
+      class="page-button next" 
+      [disabled]="currentPage >= Math.ceil(totalItems / itemsPerPage)"
+      (click)="onPageChange(currentPage + 1)"
+      aria-label="Next page"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+</div>

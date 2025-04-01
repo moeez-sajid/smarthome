@@ -1,0 +1,97 @@
+<div class="top-nav">
+  <div class="logo">
+    <a [routerLink]="['/']" title="Smart Homes - Home Page">
+      <h1>Smart Homes</h1>
+    </a>
+  </div>
+  <div class="search-container">
+    <div class="search-box" [class.active]="showResults">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (input)="onSearchInput()"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        (keydown.enter)="executeSearch()"
+        placeholder="Search articles, products, guides..."
+        class="search-input"
+        aria-label="Search smart home articles"
+      >
+      <div class="search-actions">
+        <button 
+          *ngIf="searchQuery" 
+          class="clear-search" 
+          (click)="clearSearch()"
+          aria-label="Clear search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="search-icon" (click)="executeSearch()" aria-label="Submit search">
+          <svg *ngIf="!isSearching" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <div *ngIf="isSearching" class="search-spinner">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="search-results" *ngIf="showResults">
+      <!-- Loading indicator -->
+      <div *ngIf="isSearching" class="search-loading">
+        Searching...
+      </div>
+      
+      <!-- Recent searches (show when no active search) -->
+      <div *ngIf="!isSearching && (!searchQuery || searchResults.length === 0) && recentSearches.length > 0" class="recent-searches">
+        <h3>Recent Searches</h3>
+        <div 
+          *ngFor="let search of recentSearches; let i = index" 
+          class="recent-search-item"
+          (click)="selectRecentSearch(search)"
+        >
+          <span class="search-history-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </span>
+          <span>{{ search }}</span>
+          <button class="remove-search" (click)="removeRecentSearch(i, $event)" aria-label="Remove from recent searches">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Search results -->
+      <div *ngIf="!isSearching && searchResults.length > 0" class="search-result-list">
+        <h3 *ngIf="searchQuery">Results for "{{ searchQuery }}"</h3>
+        <div 
+          *ngFor="let blog of searchResults" 
+          class="result-item"
+          (click)="selectResult(blog)"
+        >
+          <div class="result-title">{{ blog.title }}</div>
+          <div class="result-category">{{ blog.category }}</div>
+          <div class="result-description">{{ blog.description }}</div>
+        </div>
+        
+        <div class="view-all-results" *ngIf="searchResults.length > 5" (click)="executeSearch()">
+          View all results
+        </div>
+      </div>
+      
+      <!-- No results message -->
+      <div *ngIf="!isSearching && searchQuery && searchResults.length === 0" class="no-results">
+        <p>No results found for "{{ searchQuery }}"</p>
+        <p>Try different keywords or check spelling</p>
+      </div>
+    </div>
+  </div>
+</div>
