@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BlogDataService, Blog, PaginationInfo } from '../../services/blog-data.service';
+import { BlogDataService, PaginationInfo } from '../../services/blog-data.service';
 import { SeoService } from '../../services/seo.service';
+import { Blog } from '../../models/blog.model';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-blog-list',
@@ -10,6 +12,7 @@ import { SeoService } from '../../services/seo.service';
 })
 export class BlogListComponent implements OnInit {
   blogs: Blog[] = [];
+  categories: Category[] = [];
   selectedCategory: string | null = null;
   paginationInfo: PaginationInfo = {
     currentPage: 1,
@@ -26,6 +29,8 @@ export class BlogListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.categories = this.blogDataService.getCategories();
+    
     this.blogDataService.blogsToDisplay$.subscribe(blogs => {
       this.blogs = blogs;
     });
@@ -41,8 +46,11 @@ export class BlogListComponent implements OnInit {
         this.blogDataService.filterByCategory(this.selectedCategory);
         
         // Set category-specific SEO meta tags with non-null category
-        const filteredBlogs = this.blogDataService.searchBlogs(params['category']);
-        this.seoService.setCategoryMetaTags(params['category'], filteredBlogs);
+        const category = this.blogDataService.getCategoryById(this.selectedCategory || '');
+        if (category) {
+          const filteredBlogs = this.blogDataService.searchBlogs(category.name);
+          this.seoService.setCategoryMetaTags(category.name, filteredBlogs);
+        }
       } else {
         this.selectedCategory = null;
         this.blogDataService.filterByCategory(null);
@@ -62,13 +70,11 @@ export class BlogListComponent implements OnInit {
   }
 
   onPageChange(page: number): void {
-    this.blogDataService.goToPage(page);
+    this.blogDataService.setPage(page);
   }
 
-  onItemsPerPageChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const value = parseInt(select.value, 10);
-    this.blogDataService.setItemsPerPage(value);
+  onItemsPerPageChange(itemsPerPage: number): void {
+    this.blogDataService.setItemsPerPage(itemsPerPage);
   }
 
   getPageNumbers(): number[] {
@@ -90,5 +96,10 @@ export class BlogListComponent implements OnInit {
     }
     
     return pageNumbers;
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'Uncategorized';
   }
 }

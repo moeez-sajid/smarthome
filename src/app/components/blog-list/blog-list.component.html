@@ -16,7 +16,7 @@
       <select 
         id="items-per-page" 
         [(ngModel)]="paginationInfo.itemsPerPage"
-        (change)="onItemsPerPageChange($event)"
+        (change)="onItemsPerPageChange(paginationInfo.itemsPerPage)"
       >
         <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
       </select>
@@ -25,10 +25,10 @@
   
   <div class="blog-grid">
     <div *ngFor="let blog of blogs" class="blog-card">
-      <div class="blog-category">{{ blog.category }}</div>
+      <div class="blog-category">{{ getCategoryName(blog.category) }}</div>
       <h2 class="blog-title">{{ blog.title }}</h2>
       <div class="blog-date">{{ formatDate(blog.publishDate) }}</div>
-      <p class="blog-excerpt">{{ blog.content }}</p>
+      <p class="blog-excerpt">{{ blog.description }}</p>
       <a [routerLink]="['/blog', blog.slug]" class="read-more">Read More</a>
     </div>
   </div>

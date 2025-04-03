@@ -1,8 +1,10 @@
 import { Component, OnInit, ElementRef, ViewChildren, QueryList, AfterViewInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
-import { BlogDataService, Blog, ContentBlock, ProductItem } from '../../services/blog-data.service';
+import { BlogDataService } from '../../services/blog-data.service';
 import { Location } from '@angular/common';
 import { SeoService } from '../../services/seo.service';
+import { Blog, BlogSection, ContentBlock } from '../../models/blog.model';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-blog-post',
@@ -12,6 +14,7 @@ import { SeoService } from '../../services/seo.service';
 export class BlogPostComponent implements OnInit, AfterViewInit {
   blog: Blog | undefined;
   relatedBlogs: Blog[] = [];
+  category: Category | undefined;
   sectionHeadings: { id: string; heading: string }[] = [];
   currentSection: string = '';
   layoutType: 'standard' | 'featured' | 'product-review' | 'tutorial' | 'news' | 'comparison' = 'standard';
@@ -30,20 +33,20 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const slug = params.get('slug');
-      if (slug) {
-        this.blog = this.blogDataService.getBlogBySlug(slug);
-        if (this.blog) {
-          this.determineLayoutType();
-          this.relatedBlogs = this.getRelatedBlogs(this.blog);
-          this.extractSectionHeadings();
-          
-          // Update SEO metadata
-          this.seoService.setPostMetaTags(this.blog);
-        } else {
-          this.router.navigate(['/not-found']);
-        }
+    this.route.params.subscribe(params => {
+      const slug = params['slug'];
+      this.blog = this.blogDataService.getBlogBySlug(slug);
+      
+      if (this.blog) {
+        this.category = this.blogDataService.getCategoryById(this.blog.category);
+        this.relatedBlogs = this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category);
+        this.determineLayoutType();
+        this.extractSectionHeadings();
+        
+        // Set SEO meta tags
+        this.seoService.setPostMetaTags(this.blog);
+      } else {
+        this.router.navigate(['/not-found']);
       }
     });
     
@@ -95,21 +98,8 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   }
 
   determineLayoutType(): void {
-    if (!this.blog) return;
-    
-    // Use the template property if available
-    if (this.blog.template) {
-      this.layoutType = this.blog.template as any;
-      return;
-    }
-    
-    // Otherwise determine based on other properties
-    if (this.blog.featured) {
-      this.layoutType = 'featured';
-    } else if (this.blog.recommendations && this.blog.recommendations.length > 0) {
-      this.layoutType = 'product-review';
-    } else {
-      this.layoutType = 'standard';
+    if (this.blog?.template) {
+      this.layoutType = this.blog.template;
     }
   }
 
@@ -117,31 +107,13 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     return `layout-${this.layoutType}`;
   }
 
-  getRelatedBlogs(currentBlog: Blog): Blog[] {
-    return this.blogDataService.getRelatedBlogs(currentBlog.id, currentBlog.category);
-  }
-
   extractSectionHeadings(): void {
-    if (!this.blog) return;
-    
-    // Start with regular sections
-    this.sectionHeadings = this.blog.sections.map(section => ({
-      id: section.id,
+    if (!this.blog?.sections) return;
+
+    this.sectionHeadings = this.blog.sections.map((section: BlogSection, index: number) => ({
+      id: `section-${index}`,
       heading: section.heading
     }));
-    
-    // Add content blocks with headings
-    if (this.blog.contentBlocks) {
-      const contentBlockHeadings = this.blog.contentBlocks
-        .filter(block => block.heading) // Only include blocks with headings
-        .map(block => ({
-          id: block.id,
-          heading: block.heading || ''
-        }));
-      
-      // Combine both arrays
-      this.sectionHeadings = [...this.sectionHeadings, ...contentBlockHeadings];
-    }
   }
 
   navigateBack(): void {
@@ -216,5 +188,10 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   getPartialStar(rating: number | undefined): number {
     if (!rating) return 0;
     return rating % 1;
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.blogDataService.getCategoryById(categoryId);
+    return category ? category.name : 'Uncategorized';
   }
 }

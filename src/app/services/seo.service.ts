@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { Blog } from './blog-data.service';
+import { Blog } from '../models/blog.model';
+import { Category } from '../models/category.model';
 
 @Injectable({
   providedIn: 'root'
@@ -32,62 +33,47 @@ export class SeoService {
    * Set all necessary meta tags for a blog post, including Open Graph and Twitter Card
    */
   setPostMetaTags(blog: Blog): void {
-    // Basic tags
-    this.title.setTitle(`${blog.title} | Smart Homes Blog`);
-    this.meta.updateTag({ name: 'description', content: blog.description });
+    const title = `${blog.title} | Smart Homes Blog`;
+    const description = blog.description;
+    const image = blog.headerImage || 'https://yourdomain.com/images/default-blog-image.jpg';
     
-    if (blog.tags && blog.tags.length > 0) {
-      this.meta.updateTag({ name: 'keywords', content: blog.tags.join(', ') });
-    }
-    
-    // Open Graph tags
+    this.title.setTitle(title);
+    this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ property: 'og:title', content: title });
+    this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:type', content: 'article' });
-    this.meta.updateTag({ property: 'og:title', content: blog.title });
-    this.meta.updateTag({ property: 'og:description', content: blog.description });
+    this.meta.updateTag({ property: 'og:image', content: image });
     this.meta.updateTag({ property: 'og:url', content: this.getFullUrl(`/blog/${blog.slug}`) });
     
-    if (blog.headerImage) {
-      this.meta.updateTag({ property: 'og:image', content: blog.headerImage });
-    }
-    
-    // Article specific tags
+    // Add article specific meta tags
     this.meta.updateTag({ property: 'article:published_time', content: blog.publishDate.toISOString() });
-    this.meta.updateTag({ property: 'article:section', content: blog.category });
-    
-    if (blog.tags && blog.tags.length > 0) {
-      blog.tags.forEach((tag, index) => {
-        this.meta.updateTag({ property: `article:tag:${index}`, content: tag });
+    if (blog.publishedAt) {
+      this.meta.updateTag({ property: 'article:modified_time', content: blog.publishedAt.toISOString() });
+    }
+    if (blog.tags) {
+      blog.tags.forEach(tag => {
+        this.meta.updateTag({ property: 'article:tag', content: tag });
       });
     }
     
-    // Twitter Card tags
-    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-    this.meta.updateTag({ name: 'twitter:title', content: blog.title });
-    this.meta.updateTag({ name: 'twitter:description', content: blog.description });
-    
-    if (blog.headerImage) {
-      this.meta.updateTag({ name: 'twitter:image', content: blog.headerImage });
-    }
-    
-    // Canonical URL
     this.updateCanonicalUrl(`/blog/${blog.slug}`);
   }
 
   /**
    * Set category specific meta tags for category pages
    */
-  setCategoryMetaTags(category: string, blogs: Blog[]): void {
-    const title = `${category} Articles | Smart Homes Blog`;
-    const description = `Explore our collection of ${blogs.length} articles about ${category.toLowerCase()}. Find tips, guides, and product reviews for smart home enthusiasts.`;
+  setCategoryMetaTags(categoryName: string, blogs: Blog[]): void {
+    const title = `${categoryName} Articles | Smart Homes Blog`;
+    const description = `Explore our collection of ${blogs.length} articles about ${categoryName.toLowerCase()}. Find tips, guides, and product reviews for smart home enthusiasts.`;
     
     this.title.setTitle(title);
     this.meta.updateTag({ name: 'description', content: description });
     this.meta.updateTag({ property: 'og:title', content: title });
     this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:type', content: 'website' });
-    this.meta.updateTag({ property: 'og:url', content: this.getFullUrl(`/blogs?category=${encodeURIComponent(category)}`) });
+    this.meta.updateTag({ property: 'og:url', content: this.getFullUrl(`/blogs?category=${encodeURIComponent(categoryName)}`) });
     
-    this.updateCanonicalUrl(`/blogs?category=${encodeURIComponent(category)}`);
+    this.updateCanonicalUrl(`/blogs?category=${encodeURIComponent(categoryName)}`);
   }
 
   /**
@@ -128,8 +114,8 @@ export class SeoService {
    * Set blog list page meta tags
    */
   setBlogListMetaTags(): void {
-    const title = 'All Articles | Smart Homes Blog';
-    const description = 'Browse our complete collection of smart home articles, featuring guides, tutorials, product reviews, and the latest industry news.';
+    const title = 'Smart Home Blog | Tips, Guides & Reviews';
+    const description = 'Discover the latest smart home technology tips, guides, and product reviews. Learn how to make your home smarter and more efficient.';
     
     this.title.setTitle(title);
     this.meta.updateTag({ name: 'description', content: description });
@@ -164,8 +150,7 @@ export class SeoService {
    * Get absolute URL from relative path
    */
   private getFullUrl(relativePath: string): string {
-    // In a production environment, you should use the actual domain
-    const domain = 'https://smarthomesblog.com';
-    return `${domain}${relativePath}`;
+    // Replace with your actual domain
+    return `https://yourdomain.com${relativePath}`;
   }
 }

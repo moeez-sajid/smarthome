@@ -36,7 +36,7 @@
       <!-- Blog Header -->
       <div class="blog-header">
         <div class="blog-metadata">
-          <span class="blog-category">{{ blog.category }}</span>
+          <span class="blog-category">{{ getCategoryName(blog.category) }}</span>
           <span class="blog-date">{{ blog.publishDate | date:'longDate' }}</span>
           <span class="blog-author" *ngIf="blog.author">by {{ blog.author }}</span>
         </div>
@@ -58,7 +58,7 @@
       <div [ngClass]="{'tutorial-content': layoutType === 'tutorial', 'review-content': layoutType === 'product-review'}">
         <!-- For blogs with traditional sections -->
         <ng-container *ngIf="blog.sections && (!blog.contentBlocks || blog.contentBlocks.length === 0)">
-          <div *ngFor="let section of blog.sections" [id]="section.id" class="blog-section" #section>
+          <div *ngFor="let section of blog.sections; let i = index" [id]="'section-' + i" class="blog-section" #section>
             <h2 class="section-heading">{{ section.heading }}</h2>
             <div class="section-content" [innerHTML]="section.content"></div>
           </div>
@@ -67,13 +67,13 @@
         <!-- For blogs with content blocks -->
         <ng-container *ngIf="blog.contentBlocks && blog.contentBlocks.length > 0">
           <!-- Introduction section if exists -->
-          <div *ngFor="let section of blog.sections" [id]="section.id" class="blog-section" #section>
+          <div *ngFor="let section of blog.sections; let i = index" [id]="'section-' + i" class="blog-section" #section>
             <h2 class="section-heading">{{ section.heading }}</h2>
             <div class="section-content" [innerHTML]="section.content"></div>
           </div>
           
           <!-- Dynamic Content Blocks -->
-          <div *ngFor="let block of getAllContentBlocks()" [id]="block.id" class="content-block" [ngClass]="'block-' + block.type" #section>
+          <div *ngFor="let block of getAllContentBlocks(); let i = index" [id]="'block-' + i" class="content-block" [ngClass]="'block-' + block.type" #section>
             <h2 *ngIf="block.heading" class="block-heading">{{ block.heading }}</h2>
             
             <!-- Text Block -->
@@ -98,30 +98,16 @@
                   </div>
                   <div class="product-details">
                     <h3 class="product-title">{{ product.title }}</h3>
-                    
+                    <p class="product-description" *ngIf="product.description">{{ product.description }}</p>
+                    <div class="product-price" *ngIf="product.price">{{ formatPrice(product.price) }}</div>
                     <div class="product-rating" *ngIf="product.rating">
                       <div class="stars">
-                        <span *ngFor="let star of getRatingStars(product.rating)" class="star full">★</span>
-                        <span *ngIf="getPartialStar(product.rating) > 0" class="star partial" 
-                              [style.width.%]="getPartialStar(product.rating) * 100">★</span>
+                        <span *ngFor="let star of getRatingStars(product.rating)" class="star">★</span>
+                        <span *ngIf="getPartialStar(product.rating) > 0" class="star partial" [style.width.%]="getPartialStar(product.rating) * 100">★</span>
                       </div>
                       <span class="rating-value">{{ product.rating }}/5</span>
                     </div>
-                    
-                    <p class="product-price" *ngIf="product.price">{{ formatPrice(product.price) }}</p>
-                    <p class="product-description">{{ product.description }}</p>
-                    
-                    <div class="product-specs" *ngIf="product.specs">
-                      <h4>Specifications</h4>
-                      <dl>
-                        <ng-container *ngFor="let spec of product.specs | keyvalue">
-                          <dt>{{ spec.key }}</dt>
-                          <dd>{{ spec.value }}</dd>
-                        </ng-container>
-                      </dl>
-                    </div>
-                    
-                    <a [href]="product.link" class="product-link" target="_blank">View Product</a>
+                    <a *ngIf="product.link" [href]="product.link" class="product-link" target="_blank" rel="noopener noreferrer">View on Amazon</a>
                   </div>
                 </div>
               </div>
@@ -130,99 +116,64 @@
             <!-- Quote Block -->
             <div *ngIf="block.type === 'quote'" class="quote-block">
               <blockquote>
-                <p>{{ block.content }}</p>
-                <cite *ngIf="block.attribution">{{ block.attribution }}</cite>
+                <p [innerHTML]="block.content"></p>
+                <footer *ngIf="block.attribution">{{ block.attribution }}</footer>
               </blockquote>
             </div>
             
             <!-- Video Block -->
             <div *ngIf="block.type === 'video'" class="video-block">
-              <div class="video-container" *ngIf="block.videoUrl">
-                <iframe [src]="block.videoUrl | safe" frameborder="0" allowfullscreen></iframe>
+              <div class="video-container">
+                <iframe [src]="block.videoUrl | safe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               </div>
-              <p *ngIf="block.content" class="video-caption">{{ block.content }}</p>
+              <p *ngIf="block.content" class="video-caption" [innerHTML]="block.content"></p>
             </div>
             
             <!-- Code Block -->
             <div *ngIf="block.type === 'code'" class="code-block">
-              <div class="code-header" *ngIf="block.language">
-                <span class="language-tag">{{ block.language }}</span>
-              </div>
-              <pre><code [innerHTML]="block.code"></code></pre>
-              <p *ngIf="block.content" class="code-description">{{ block.content }}</p>
+              <pre><code [class]="block.language">{{ block.code }}</code></pre>
+              <p *ngIf="block.content" class="code-description" [innerHTML]="block.content"></p>
             </div>
             
             <!-- Comparison Table Block -->
-            <div *ngIf="block.type === 'comparison-table'" class="table-block">
-              <div class="responsive-table">
-                <table *ngIf="block.tableData">
-                  <thead>
-                    <tr>
-                      <th *ngFor="let header of block.tableData.headers">{{ header }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let row of block.tableData.rows">
-                      <td *ngFor="let cell of row">{{ cell }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p *ngIf="block.content" class="table-description">{{ block.content }}</p>
+            <div *ngIf="block.type === 'comparison-table'" class="comparison-table-block">
+              <table>
+                <thead>
+                  <tr>
+                    <th *ngFor="let header of block.tableData?.headers">{{ header }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of block.tableData?.rows">
+                    <td *ngFor="let cell of row">{{ cell }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             
             <!-- List Block -->
             <div *ngIf="block.type === 'list'" class="list-block">
-              <ul class="custom-list">
+              <ul>
                 <li *ngFor="let item of block.items">
-                  <a *ngIf="item.link" [href]="item.link" target="_blank">{{ item.text }}</a>
-                  <span *ngIf="!item.link">{{ item.text }}</span>
+                  <span [innerHTML]="item.text"></span>
+                  <a *ngIf="item.link" [href]="item.link" target="_blank" rel="noopener noreferrer">Learn more</a>
                 </li>
               </ul>
-              <p *ngIf="block.content" class="list-description">{{ block.content }}</p>
             </div>
           </div>
         </ng-container>
       </div>
-      
-      <!-- Product Recommendations Section -->
-      <div class="product-recommendations" *ngIf="blog.recommendations && blog.recommendations.length > 0">
-        <h2 class="recommendations-title">Recommended Products</h2>
-        <div class="product-grid">
-          <div *ngFor="let product of blog.recommendations" class="product-card">
-            <div class="product-image" *ngIf="product.image">
-              <img [src]="product.image" [alt]="product.title">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">{{ product.title }}</h3>
-              
-              <div class="product-rating" *ngIf="product.rating">
-                <div class="stars">
-                  <span *ngFor="let star of getRatingStars(product.rating)" class="star full">★</span>
-                  <span *ngIf="getPartialStar(product.rating) > 0" class="star partial" 
-                        [style.width.%]="getPartialStar(product.rating) * 100">★</span>
-                </div>
-                <span class="rating-value">{{ product.rating }}/5</span>
-              </div>
-              
-              <p class="product-price" *ngIf="product.price">{{ formatPrice(product.price) }}</p>
-              <p class="product-description">{{ product.description }}</p>
-              <a [href]="product.link" class="product-link" target="_blank">View Product</a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- Related Articles Section -->
-  <div class="related-articles" *ngIf="relatedBlogs && relatedBlogs.length > 0">
+  <!-- Related Articles -->
+  <div class="related-articles" *ngIf="relatedBlogs.length > 0">
     <h2>Related Articles</h2>
     <div class="related-grid">
       <div *ngFor="let relatedBlog of relatedBlogs" class="related-card">
         <h3>{{ relatedBlog.title }}</h3>
         <p>{{ relatedBlog.description }}</p>
-        <a [routerLink]="['/blog', relatedBlog.slug]" class="read-more">Read More</a>
+        <a [routerLink]="['/blog', relatedBlog.slug]">Read More</a>
       </div>
     </div>
   </div>

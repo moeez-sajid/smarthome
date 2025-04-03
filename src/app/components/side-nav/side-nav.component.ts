@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BlogDataService } from '../../services/blog-data.service';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-side-nav',
@@ -7,7 +8,7 @@ import { BlogDataService } from '../../services/blog-data.service';
   styleUrls: ['./side-nav.component.scss']
 })
 export class SideNavComponent implements OnInit {
-  categories: string[] = [];
+  categories: Category[] = [];
   isExpanded = false;
   selectedCategory: string | null = null;
   startDate: Date | null = null;
@@ -23,14 +24,15 @@ export class SideNavComponent implements OnInit {
     this.isExpanded = !this.isExpanded;
   }
 
-  selectCategory(category: string | null) {
-    this.selectedCategory = category;
-    this.blogDataService.filterByCategory(category);
+  selectCategory(categoryId: string | null) {
+    this.selectedCategory = categoryId;
+    this.blogDataService.filterByCategory(categoryId);
   }
 
   onDateFilterChange() {
     if (this.startDate && this.endDate) {
-      this.blogDataService.filterByDate(this.startDate, this.endDate);
+      // Implement date filtering logic here
+      console.log('Date filter changed:', this.startDate, this.endDate);
     }
   }
 }

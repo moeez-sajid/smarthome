@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BlogDataService, Blog } from '../../services/blog-data.service';
+import { BlogDataService } from '../../services/blog-data.service';
+import { Blog } from '../../models/blog.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
@@ -107,6 +108,11 @@ export class TopNavSearchComponent implements OnInit {
     event.stopPropagation();
     this.recentSearches.splice(index, 1);
     localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.blogDataService.getCategoryById(categoryId);
+    return category ? category.name : 'Uncategorized';
   }
 
   private addToRecentSearches(query: string): void {

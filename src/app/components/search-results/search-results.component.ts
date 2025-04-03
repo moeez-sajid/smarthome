@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
-import { BlogDataService, Blog } from '../../services/blog-data.service';
+import { BlogDataService } from '../../services/blog-data.service';
+import { Blog } from '../../models/blog.model';
 
 @Component({
   selector: 'app-search-results',
@@ -44,18 +45,23 @@ export class SearchResultsComponent implements OnInit {
   }
 
   performSearch(): void {
-    this.isLoading = true;
-    
-    // Get all results
-    this.searchResults = this.blogDataService.searchBlogs(this.searchQuery);
-    this.totalItems = this.searchResults.length;
-    
-    // Get paginated results
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.searchResults = this.searchResults.slice(startIndex, endIndex);
-    
-    this.isLoading = false;
+    try {
+      this.isLoading = true;
+      
+      // Get all results
+      this.searchResults = this.blogDataService.searchBlogs(this.searchQuery);
+      this.totalItems = this.searchResults.length;
+      
+      // Get paginated results
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      this.searchResults = this.searchResults.slice(startIndex, endIndex);
+      
+      this.isLoading = false;
+    } catch (error) {
+      console.error('Error in performSearch:', error);
+      this.isLoading = false;
+    }
   }
 
   onPageChange(page: number): void {
@@ -68,6 +74,11 @@ export class SearchResultsComponent implements OnInit {
 
   clearSearch(): void {
     this.router.navigate(['/blogs']);
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.blogDataService.getCategoryById(categoryId);
+    return category ? category.name : 'Uncategorized';
   }
 
   private updateMetadata(): void {
