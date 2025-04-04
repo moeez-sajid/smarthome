@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Blog } from '../../models/blog.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-top-nav-search',
@@ -20,14 +21,17 @@ export class TopNavSearchComponent implements OnInit {
 
   constructor(
     private blogDataService: BlogDataService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
   ngOnInit(): void {
-    // Initialize recent searches from localStorage
-    const savedSearches = localStorage.getItem('recentSearches');
-    if (savedSearches) {
-      this.recentSearches = JSON.parse(savedSearches);
+    // Initialize recent searches from localStorage only in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      const savedSearches = localStorage.getItem('recentSearches');
+      if (savedSearches) {
+        this.recentSearches = JSON.parse(savedSearches);
+      }
     }
 
     // Setup debounced search
@@ -44,9 +48,9 @@ export class TopNavSearchComponent implements OnInit {
     this.searchSubject.next(this.searchQuery.trim());
   }
 
-  performSearch(query: string): void {
+ async performSearch(query: string) {
     if (query) {
-      this.searchResults = this.blogDataService.searchBlogs(query);
+      this.searchResults = await  this.blogDataService.searchBlogs(query);
       this.showResults = true;
     } else {
       this.searchResults = [];
@@ -107,7 +111,9 @@ export class TopNavSearchComponent implements OnInit {
   removeRecentSearch(index: number, event: Event): void {
     event.stopPropagation();
     this.recentSearches.splice(index, 1);
-    localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+    }
   }
 
   getCategoryName(categoryId: string): string {
@@ -127,7 +133,9 @@ export class TopNavSearchComponent implements OnInit {
       this.recentSearches = this.recentSearches.slice(0, 5);
     }
     
-    // Save to localStorage
-    localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+    // Save to localStorage only in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
+    }
   }
 }

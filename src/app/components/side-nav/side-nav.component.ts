@@ -16,8 +16,8 @@ export class SideNavComponent implements OnInit {
 
   constructor(private blogDataService: BlogDataService) {}
 
-  ngOnInit() {
-    this.categories = this.blogDataService.getCategories();
+  async ngOnInit() {
+    this.categories = await this.blogDataService.getCategoriesFromServer();
   }
 
   toggleExpand() {

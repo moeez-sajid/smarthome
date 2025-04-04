@@ -28,7 +28,7 @@ export class BlogListComponent implements OnInit {
     private seoService: SeoService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.categories = this.blogDataService.getCategories();
     
     this.blogDataService.blogsToDisplay$.subscribe(blogs => {
@@ -40,20 +40,20 @@ export class BlogListComponent implements OnInit {
     });
 
     // Handle query parameters for category filtering
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe(async params => {
       if (params['category']) {
         this.selectedCategory = params['category'];
-        this.blogDataService.filterByCategory(this.selectedCategory);
+        await this.blogDataService.filterByCategory(this.selectedCategory);
         
         // Set category-specific SEO meta tags with non-null category
         const category = this.blogDataService.getCategoryById(this.selectedCategory || '');
         if (category) {
-          const filteredBlogs = this.blogDataService.searchBlogs(category.name);
+          const filteredBlogs = await this.blogDataService.searchBlogs(category.name);
           this.seoService.setCategoryMetaTags(category.name, filteredBlogs);
         }
       } else {
         this.selectedCategory = null;
-        this.blogDataService.filterByCategory(null);
+        await this.blogDataService.filterByCategory(null);
         
         // Set general blog list meta tags
         this.seoService.setBlogListMetaTags();
@@ -99,7 +99,7 @@ export class BlogListComponent implements OnInit {
   }
 
   getCategoryName(categoryId: string): string {
-    const category = this.categories.find(cat => cat.id === categoryId);
+    const category = this.categories.find(cat => cat._id === categoryId);
     return category ? category.name : 'Uncategorized';
   }
 }

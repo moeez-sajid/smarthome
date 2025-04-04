@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Blog } from '../models/blog.model';
 import { Category } from '../models/category.model';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class SeoService {
   constructor(
     private meta: Meta,
     private title: Title,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
   /**
@@ -133,17 +135,19 @@ export class SeoService {
   private updateCanonicalUrl(relativePath: string): void {
     const fullUrl = this.getFullUrl(relativePath);
     
-    // Remove any existing canonical links
-    const existingCanonical = document.querySelector('link[rel="canonical"]');
-    if (existingCanonical) {
-      existingCanonical.remove();
+    if (isPlatformBrowser(this.platformId)) {
+      // Remove any existing canonical links
+      const existingCanonical = document.querySelector('link[rel="canonical"]');
+      if (existingCanonical) {
+        existingCanonical.remove();
+      }
+      
+      // Add the canonical link
+      const linkElement = document.createElement('link');
+      linkElement.setAttribute('rel', 'canonical');
+      linkElement.setAttribute('href', fullUrl);
+      document.head.appendChild(linkElement);
     }
-    
-    // Add the canonical link
-    const linkElement = document.createElement('link');
-    linkElement.setAttribute('rel', 'canonical');
-    linkElement.setAttribute('href', fullUrl);
-    document.head.appendChild(linkElement);
   }
 
   /**

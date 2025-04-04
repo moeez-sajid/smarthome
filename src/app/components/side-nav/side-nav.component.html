@@ -12,8 +12,8 @@
     <div class="categories-list" [class.expanded]="isExpanded">
       <button 
         *ngFor="let category of categories" 
-        [class.active]="selectedCategory === category.id"
-        (click)="selectCategory(category.id)"
+        [class.active]="selectedCategory === category._id"
+        (click)="selectCategory(category._id)"
       >
         {{ category.name }}
       </button>

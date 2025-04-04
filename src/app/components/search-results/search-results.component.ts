@@ -44,12 +44,12 @@ export class SearchResultsComponent implements OnInit {
     });
   }
 
-  performSearch(): void {
+  async performSearch() {
     try {
       this.isLoading = true;
       
       // Get all results
-      this.searchResults = this.blogDataService.searchBlogs(this.searchQuery);
+      this.searchResults = await this.blogDataService.searchBlogs(this.searchQuery);
       this.totalItems = this.searchResults.length;
       
       // Get paginated results

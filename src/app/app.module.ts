@@ -12,6 +12,7 @@ import { BlogListComponent } from './components/blog-list/blog-list.component';
 import { BlogPostComponent } from './components/blog-post/blog-post.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { SearchResultsComponent } from './components/search-results/search-resul
     BrowserModule,
     CommonModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

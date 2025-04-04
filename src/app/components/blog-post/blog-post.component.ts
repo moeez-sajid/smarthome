@@ -32,14 +32,14 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     private seoService: SeoService
   ) { }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
+  async ngOnInit(): Promise<void> {
+    this.route.params.subscribe(async params => {
       const slug = params['slug'];
-      this.blog = this.blogDataService.getBlogBySlug(slug);
+      this.blog = await this.blogDataService.getBlogBySlug(slug);
       
       if (this.blog) {
         this.category = this.blogDataService.getCategoryById(this.blog.category);
-        this.relatedBlogs = this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category);
+        this.relatedBlogs = await this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category);
         this.determineLayoutType();
         this.extractSectionHeadings();
         
