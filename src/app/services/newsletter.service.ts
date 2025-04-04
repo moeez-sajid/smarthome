@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class NewsletterService {
-  private apiUrl = '/api/submitnewsletter';
+  private apiUrl = '/api/subscribe';
 
   constructor(private http: HttpClient) { }
 
