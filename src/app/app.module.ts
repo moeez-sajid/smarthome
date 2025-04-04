@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -13,6 +13,8 @@ import { BlogPostComponent } from './components/blog-post/blog-post.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { HttpClientModule } from '@angular/common/http';
+import { FooterComponent } from './components/footer/footer.component';
+import { NewsletterPopupComponent } from './components/newsletter-popup/newsletter-popup.component';
 
 @NgModule({
   declarations: [
@@ -23,12 +25,15 @@ import { HttpClientModule } from '@angular/common/http';
     BlogListComponent,
     BlogPostComponent,
     SafePipe,
-    SearchResultsComponent
+    SearchResultsComponent,
+    FooterComponent,
+    NewsletterPopupComponent
   ],
   imports: [
     BrowserModule,
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
   ],

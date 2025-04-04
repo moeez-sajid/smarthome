@@ -30,7 +30,7 @@
       </div>
       <div class="result-content">
         <div class="result-meta">
-          <span class="result-category">{{ getCategoryName(blog.category) }}</span>
+          <span class="result-category">{{ blog.category.name }}</span>
           <span class="result-date">{{ blog.publishDate | date:'MMM d, yyyy' }}</span>
         </div>
         <h2 class="result-title">{{ blog.title }}</h2>

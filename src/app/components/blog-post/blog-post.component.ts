@@ -38,8 +38,8 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
       this.blog = await this.blogDataService.getBlogBySlug(slug);
       
       if (this.blog) {
-        this.category = this.blogDataService.getCategoryById(this.blog.category);
-        this.relatedBlogs = await this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category);
+        this.category = this.blogDataService.getCategoryById(this.blog.category._id);
+        this.relatedBlogs = await this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category.name);
         this.determineLayoutType();
         this.extractSectionHeadings();
         
@@ -116,15 +116,16 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     }));
   }
 
-  navigateBack(): void {
+  navigateBack() {
     // Check if we have a stored URL from the blog list
-    const previousUrl = localStorage.getItem('blogListUrl');
-    if (previousUrl) {
-      this.router.navigateByUrl(previousUrl);
-    } else {
-      // If no stored URL, go back to the browser history
-      this.location.back();
-    }
+    this.router.navigateByUrl('');
+    // const previousUrl = localStorage.getItem('blogListUrl');
+    // if (previousUrl) {
+    //   this.router.navigateByUrl(previousUrl);
+    // } else {
+    //   // If no stored URL, go back to the browser history
+    //   this.location.back();
+    // }
   }
 
   scrollToSection(sectionId: string): void {

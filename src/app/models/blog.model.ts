@@ -1,3 +1,5 @@
+import { Category } from "./category.model";
+
 export interface ProductItem {
   title: string;
   description?: string;
@@ -39,8 +41,8 @@ export interface Blog {
   id: string;
   title: string;
   content: string;
-  category: string; // Category ID
-  author: string; // User ID
+  category: Category; // Category ID
+  author: {username:string}; // User ID
   tags?: string[];
   status: 'draft' | 'published';
   publishedAt?: Date;

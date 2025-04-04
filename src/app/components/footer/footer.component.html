@@ -1,0 +1,60 @@
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>About Us</h3>
+      <p>Your smart home solution provider, making life easier and more connected.</p>
+      <div class="social-links">
+        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-facebook"></i>
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </div>
+    </div>
+    
+    <div class="footer-section">
+      <h3>Newsletter</h3>
+      <p>Subscribe to our newsletter for the latest updates and offers.</p>
+      <form [formGroup]="newsletterForm" (ngSubmit)="onSubmit()" class="newsletter-form">
+        <div class="form-group">
+          <input 
+            type="email" 
+            formControlName="email" 
+            placeholder="Enter your email"
+            [class.is-invalid]="newsletterForm.get('email')?.invalid && newsletterForm.get('email')?.touched"
+          >
+          <div class="error-message" *ngIf="newsletterForm.get('email')?.invalid && newsletterForm.get('email')?.touched">
+            Please enter a valid email address
+          </div>
+        </div>
+        <button type="submit" [disabled]="newsletterForm.invalid || submitted">
+          Subscribe
+        </button>
+      </form>
+      
+      <div class="alert alert-success" *ngIf="success">
+        Thank you for subscribing to our newsletter!
+      </div>
+      <div class="alert alert-error" *ngIf="error">
+        Something went wrong. Please try again later.
+      </div>
+    </div>
+    
+    <div class="footer-section">
+      <h3>Contact</h3>
+      <p>Email: info&#64;smarthome.com</p>
+      <p>Phone: +1 (555) 123-4567</p>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>&copy; 2025 SmartHome. All rights reserved.</p>
+  </div>
+</footer> 

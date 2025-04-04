@@ -36,9 +36,9 @@
       <!-- Blog Header -->
       <div class="blog-header">
         <div class="blog-metadata">
-          <span class="blog-category">{{ getCategoryName(blog.category) }}</span>
+          <span class="blog-category">{{ blog.category.name }}</span>
           <span class="blog-date">{{ blog.publishDate | date:'longDate' }}</span>
-          <span class="blog-author" *ngIf="blog.author">by {{ blog.author }}</span>
+          <span class="blog-author" *ngIf="blog.author">by {{ blog.author.username }}</span>
         </div>
         <h1 class="blog-title">{{ blog.title }}</h1>
         <p class="blog-description">{{ blog.description }}</p>
