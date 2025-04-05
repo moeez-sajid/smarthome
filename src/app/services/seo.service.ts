@@ -9,6 +9,10 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class SeoService {
+  private readonly defaultMetaDescription = 'Discover expert smart home guides, product reviews, and DIY projects to transform your home with the latest technology and automation solutions.';
+  private readonly defaultMetaTitle = 'Smart Homes Blog | Expert Guides & Product Reviews for Smart Home Enthusiasts';
+  private readonly defaultKeywords = ['smart home', 'home automation', 'IoT', 'smart devices', 'home technology'];
+
   constructor(
     private meta: Meta,
     private title: Title,
@@ -26,28 +30,47 @@ export class SeoService {
     // Set basic meta tags
     this.meta.updateTag({ name: 'description', content: description });
     
-    if (keywords && keywords.length > 0) {
-      this.meta.updateTag({ name: 'keywords', content: keywords.join(', ') });
+    // Update or add keywords
+    const finalKeywords = keywords || this.defaultKeywords;
+    this.meta.updateTag({ name: 'keywords', content: finalKeywords.join(', ') });
+
+    // Add viewport meta tag if not present
+    if (!this.meta.getTag('name="viewport"')) {
+      this.meta.addTag({ name: 'viewport', content: 'width=device-width, initial-scale=1' });
     }
+
+    // Add language meta tag
+    this.meta.updateTag({ name: 'language', content: 'English' });
   }
 
   /**
    * Set all necessary meta tags for a blog post, including Open Graph and Twitter Card
    */
   setPostMetaTags(blog: Blog): void {
-    const title = `${blog.title} | Smart Homes Blog`;
-    const description = blog.description;
+    const title = blog.metaTitle || `${blog.title} | Smart Homes Blog`;
+    const description = blog.metaDescription || blog.description;
     const image = blog.headerImage || 'https://yourdomain.com/images/default-blog-image.jpg';
+    const keywords = blog.keywords || this.defaultKeywords;
     
+    // Basic meta tags
     this.title.setTitle(title);
     this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ name: 'keywords', content: keywords.join(', ') });
+    
+    // Open Graph meta tags
     this.meta.updateTag({ property: 'og:title', content: title });
     this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:type', content: 'article' });
     this.meta.updateTag({ property: 'og:image', content: image });
     this.meta.updateTag({ property: 'og:url', content: this.getFullUrl(`/blog/${blog.slug}`) });
     
-    // Add article specific meta tags
+    // Twitter Card meta tags
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:title', content: title });
+    this.meta.updateTag({ name: 'twitter:description', content: description });
+    this.meta.updateTag({ name: 'twitter:image', content: image });
+    
+    // Article specific meta tags
     this.meta.updateTag({ property: 'article:published_time', content: blog.publishDate.toISOString() });
     if (blog.publishedAt) {
       this.meta.updateTag({ property: 'article:modified_time', content: blog.publishedAt.toISOString() });
@@ -56,6 +79,11 @@ export class SeoService {
       blog.tags.forEach(tag => {
         this.meta.updateTag({ property: 'article:tag', content: tag });
       });
+    }
+    
+    // Add author meta tag
+    if (blog.author?.username) {
+      this.meta.updateTag({ name: 'author', content: blog.author.username });
     }
     
     this.updateCanonicalUrl(`/blog/${blog.slug}`);
@@ -67,9 +95,11 @@ export class SeoService {
   setCategoryMetaTags(categoryName: string, blogs: Blog[]): void {
     const title = `${categoryName} Articles | Smart Homes Blog`;
     const description = `Explore our collection of ${blogs.length} articles about ${categoryName.toLowerCase()}. Find tips, guides, and product reviews for smart home enthusiasts.`;
+    const keywords = [...this.defaultKeywords, categoryName.toLowerCase()];
     
     this.title.setTitle(title);
     this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ name: 'keywords', content: keywords.join(', ') });
     this.meta.updateTag({ property: 'og:title', content: title });
     this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:type', content: 'website' });
@@ -84,9 +114,11 @@ export class SeoService {
   setSearchMetaTags(query: string): void {
     const title = `Search results for "${query}" | Smart Homes Blog`;
     const description = `Search results for ${query} on Smart Homes Blog. Find articles, guides, and product reviews.`;
+    const keywords = [...this.defaultKeywords, query.toLowerCase()];
     
     this.title.setTitle(title);
     this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ name: 'keywords', content: keywords.join(', ') });
     
     // Set noindex for search pages
     this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
@@ -96,13 +128,11 @@ export class SeoService {
    * Set home page meta tags
    */
   setHomeMetaTags(): void {
-    const title = 'Smart Homes Blog | Expert Guides & Product Reviews for Smart Home Enthusiasts';
-    const description = 'Discover expert smart home guides, product reviews, and DIY projects to transform your home with the latest technology and automation solutions.';
-    
-    this.title.setTitle(title);
-    this.meta.updateTag({ name: 'description', content: description });
-    this.meta.updateTag({ property: 'og:title', content: title });
-    this.meta.updateTag({ property: 'og:description', content: description });
+    this.title.setTitle(this.defaultMetaTitle);
+    this.meta.updateTag({ name: 'description', content: this.defaultMetaDescription });
+    this.meta.updateTag({ name: 'keywords', content: this.defaultKeywords.join(', ') });
+    this.meta.updateTag({ property: 'og:title', content: this.defaultMetaTitle });
+    this.meta.updateTag({ property: 'og:description', content: this.defaultMetaDescription });
     this.meta.updateTag({ property: 'og:type', content: 'website' });
     this.meta.updateTag({ property: 'og:url', content: this.getFullUrl('/') });
     
@@ -121,6 +151,7 @@ export class SeoService {
     
     this.title.setTitle(title);
     this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ name: 'keywords', content: this.defaultKeywords.join(', ') });
     this.meta.updateTag({ property: 'og:title', content: title });
     this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:type', content: 'website' });

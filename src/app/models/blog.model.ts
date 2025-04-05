@@ -44,11 +44,14 @@ export interface Blog {
   category: Category; // Category ID
   author: {username:string}; // User ID
   tags?: string[];
+  keywords?: string[];
   status: 'draft' | 'published';
   publishedAt?: Date;
   publishDate: Date;
   slug: string;
   description: string;
+  metaTitle?: string;
+  metaDescription?: string;
   featured: boolean;
   template?: 'standard' | 'product-review' | 'tutorial' | 'news' | 'comparison';
   headerImage?: string;
