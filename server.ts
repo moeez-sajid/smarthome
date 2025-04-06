@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import axios from 'axios';
 import AppServerModule from './src/main.server';
-import { environment } from './src/environments/environment.server';
+import { environment } from './src/environments/environment';
 
 // Global cache for blog posts
 let cachedPosts: any = [];
