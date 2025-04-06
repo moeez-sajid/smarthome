@@ -12,7 +12,8 @@ let cachedPosts: any = [];
 // Function to fetch and cache blog posts
 async function fetchAndCachePosts() {
   try {
-    const response = await axios.get('http://localhost:3000/api/blogs');
+    const apiUrl = process.env['API_URL'] || 'https://smarthope-api-eacdda4ffb2f.herokuapp.com';
+    const response = await axios.get(`${apiUrl}/blogs`);
     cachedPosts = response.data.blogs;
     console.log('res',response.data.blogs)
     console.log(`Successfully cached ${cachedPosts.length} blog posts`);
@@ -36,6 +37,7 @@ export function app(): express.Express {
 
   // Robots.txt route
   server.get('/robots.txt', (req, res) => {
+    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
     const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin/
@@ -43,7 +45,7 @@ Disallow: /api/
 Disallow: /search/
 Disallow: /auth/
 
-Sitemap: http://localhost:4200/sitemap.xml`;
+Sitemap: ${baseUrl}/sitemap.xml`;
 
     res.set('Content-Type', 'text/plain');
     res.send(robotsTxt);
@@ -51,7 +53,7 @@ Sitemap: http://localhost:4200/sitemap.xml`;
 
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
-    const baseUrl = `http://localhost:4200`;
+    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
     
     // Start XML structure
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -63,7 +65,7 @@ Sitemap: http://localhost:4200/sitemap.xml`;
     xml += '    <changefreq>daily</changefreq>\n';
     xml += '  </url>\n';
     
-    // Add blog posts if they exist and are in the correct format
+    // Add blog posts if they exist and in the correct format
     if (Array.isArray(cachedPosts)) {
       cachedPosts.forEach(post => {
         if (post && typeof post === 'object' && post.slug) {
@@ -120,7 +122,7 @@ function run(): void {
       // Start up the Node server
       const server = app();
       server.listen(port, () => {
-        console.log(`Node Express server listening on http://localhost:${port}`);
+        console.log(`Node Express server listening on port ${port}`);
       });
     })
     .catch(error => {
