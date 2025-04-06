@@ -7,6 +7,8 @@ import { Blog, BlogSection, ContentBlock } from '../../models/blog.model';
 import { Category } from '../../models/category.model';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-blog-post',
@@ -14,7 +16,7 @@ import { PLATFORM_ID } from '@angular/core';
   styleUrls: ['./blog-post.component.scss']
 })
 export class BlogPostComponent implements OnInit, AfterViewInit {
-  blog: Blog | undefined;
+  blog: Blog | null = null;
   relatedBlogs: Blog[] = [];
   category: Category | undefined;
   sectionHeadings: { id: string; heading: string }[] = [];
@@ -32,26 +34,26 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     private renderer: Renderer2,
     private el: ElementRef,
     private location: Location,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private title: Title,
+    private meta: Meta
   ) { }
 
-  async ngOnInit(): Promise<void> {
-    this.route.params.subscribe(async params => {
-      const slug = params['slug'];
-      this.blog = await this.blogDataService.getBlogBySlug(slug);
+  async ngOnInit() {
+    // Get the resolved blog post data
+    this.blog = this.route.snapshot.data['post'];
+    
+    if (this.blog) {
+      this.category = this.blogDataService.getCategoryById(this.blog.category._id);
+      this.relatedBlogs = await this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category.name);
+      this.determineLayoutType();
+      this.extractSectionHeadings();
       
-      if (this.blog) {
-        this.category = this.blogDataService.getCategoryById(this.blog.category._id);
-        this.relatedBlogs = await this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category.name);
-        this.determineLayoutType();
-        this.extractSectionHeadings();
-        
-        // Set SEO meta tags
-        this.seoService.setPostMetaTags(this.blog);
-      } else {
-        this.router.navigate(['/not-found']);
-      }
-    });
+      // Set SEO meta tags for the blog post
+      this.setMetaTags();
+    } else {
+      this.router.navigate(['/not-found']);
+    }
     
     // Store the return URL if coming from the blog list
     this.router.events.subscribe(event => {
@@ -72,6 +74,34 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
         }, 500);
       }
     });
+  }
+
+  private setMetaTags() {
+    if (!this.blog) return;
+
+    const title = this.blog.metaTitle || this.blog.title;
+    const description = this.blog.metaDescription || this.blog.description;
+    const url = `${environment.baseUrl}/blog/${this.blog.slug}`;
+    const image = this.blog.headerImage || environment.defaultImage;
+
+    // Set title
+    this.title.setTitle(`${title} | ${environment.siteName}`);
+
+    // Set meta description
+    this.meta.updateTag({ name: 'description', content: description });
+
+    // Set Open Graph tags
+    this.meta.updateTag({ property: 'og:title', content: title });
+    this.meta.updateTag({ property: 'og:description', content: description });
+    this.meta.updateTag({ property: 'og:url', content: url });
+    this.meta.updateTag({ property: 'og:type', content: 'article' });
+    this.meta.updateTag({ property: 'og:image', content: image });
+
+    // Set Twitter Card tags
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:title', content: title });
+    this.meta.updateTag({ name: 'twitter:description', content: description });
+    this.meta.updateTag({ name: 'twitter:image', content: image });
   }
 
   ngAfterViewInit(): void {

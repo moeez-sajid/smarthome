@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Blog } from '../models/blog.model';
 import { Category } from '../models/category.model';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -47,9 +48,9 @@ export class SeoService {
    * Set all necessary meta tags for a blog post, including Open Graph and Twitter Card
    */
   setPostMetaTags(blog: Blog): void {
-    const title = blog.metaTitle || `${blog.title} | Smart Homes Blog`;
-    const description = blog.metaDescription || blog.description;
-    const image = blog.headerImage || 'https://yourdomain.com/images/default-blog-image.jpg';
+    const title = blog.metaTitle || `${blog.title} | ${environment.siteName}`;
+    const description = blog.metaDescription || environment.siteDescription;
+    const image = blog.headerImage || environment.defaultImage;
     const keywords = blog.keywords || this.defaultKeywords;
     
     // Basic meta tags
@@ -128,11 +129,11 @@ export class SeoService {
    * Set home page meta tags
    */
   setHomeMetaTags(): void {
-    this.title.setTitle(this.defaultMetaTitle);
-    this.meta.updateTag({ name: 'description', content: this.defaultMetaDescription });
+    this.title.setTitle(environment.siteName);
+    this.meta.updateTag({ name: 'description', content: environment.siteDescription });
     this.meta.updateTag({ name: 'keywords', content: this.defaultKeywords.join(', ') });
-    this.meta.updateTag({ property: 'og:title', content: this.defaultMetaTitle });
-    this.meta.updateTag({ property: 'og:description', content: this.defaultMetaDescription });
+    this.meta.updateTag({ property: 'og:title', content: environment.siteName });
+    this.meta.updateTag({ property: 'og:description', content: environment.siteDescription });
     this.meta.updateTag({ property: 'og:type', content: 'website' });
     this.meta.updateTag({ property: 'og:url', content: this.getFullUrl('/') });
     
@@ -185,7 +186,6 @@ export class SeoService {
    * Get absolute URL from relative path
    */
   private getFullUrl(relativePath: string): string {
-    // Replace with your actual domain
-    return `https://yourdomain.com${relativePath}`;
+    return `${environment.baseUrl}${relativePath}`;
   }
 }

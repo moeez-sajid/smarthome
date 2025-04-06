@@ -3,6 +3,7 @@ import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { Blog, BlogSection, ContentBlock } from '../models/blog.model';
 import { Category } from '../models/category.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export interface PaginationInfo {
   currentPage: number;
@@ -36,7 +37,7 @@ export class BlogDataService {
   async getCategoriesFromServer(): Promise<Category[]> {
     try {
       const res = await firstValueFrom(
-        this.httpClient.get<Category[]>('http://localhost:3000/api/categories')
+        this.httpClient.get<Category[]>(`${environment.apiUrl}/categories`)
       );
       this.categories = res;
     } catch (error) {
@@ -66,7 +67,7 @@ export class BlogDataService {
       }
 
       const res = await firstValueFrom(
-        this.httpClient.get<any>('http://localhost:3000/api/blogs', { params })
+        this.httpClient.get<any>(`${environment.apiUrl}/blogs`, { params })
       );
 
       this.blogsToDisplaySubject.next(res.blogs);

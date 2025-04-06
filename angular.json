@@ -43,7 +43,6 @@
             ],
             "scripts": [],
             "server": "src/main.server.ts",
-            "prerender": true,
             "ssr": {
               "entry": "server.ts"
             }
@@ -68,6 +67,67 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/smarthome/server",
+            "main": "src/main.server.ts",
+            "tsConfig": "tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "sourceMap": false,
+              "optimization": true
+            },
+            "development": {
+              "sourceMap": true,
+              "optimization": false
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "smarthome:build:development",
+              "serverTarget": "smarthome:server:development"
+            },
+            "production": {
+              "browserTarget": "smarthome:build:production",
+              "serverTarget": "smarthome:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "routes": [
+              "/",
+              "/blogs",
+              "/blog/:slug"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "smarthome:build:production",
+              "serverTarget": "smarthome:server:production"
+            },
+            "development": {
+              "browserTarget": "smarthome:build:development",
+              "serverTarget": "smarthome:server:development"
             }
           },
           "defaultConfiguration": "production"

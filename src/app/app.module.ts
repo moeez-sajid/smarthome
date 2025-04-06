@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,7 +13,6 @@ import { BlogListComponent } from './components/blog-list/blog-list.component';
 import { BlogPostComponent } from './components/blog-post/blog-post.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
-import { HttpClientModule } from '@angular/common/http';
 import { FooterComponent } from './components/footer/footer.component';
 import { NewsletterPopupComponent } from './components/newsletter-popup/newsletter-popup.component';
 
@@ -35,9 +35,10 @@ import { NewsletterPopupComponent } from './components/newsletter-popup/newslett
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    HttpClientModule,
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(withFetch())
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

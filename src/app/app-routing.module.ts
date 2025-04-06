@@ -4,11 +4,18 @@ import { MainComponent } from './components/main/main.component';
 import { BlogPostComponent } from './components/blog-post/blog-post.component';
 import { BlogListComponent } from './components/blog-list/blog-list.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
+import { BlogPostResolver } from './resolvers/blog-post.resolver';
 
 const routes: Routes = [
   { path: '', component: MainComponent },
   { path: 'blogs', component: BlogListComponent },
-  { path: 'blog/:slug', component: BlogPostComponent },
+  { 
+    path: 'blog/:slug', 
+    component: BlogPostComponent,
+    resolve: {
+      post: BlogPostResolver
+    }
+  },
   { path: 'search', component: SearchResultsComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
