@@ -97,13 +97,26 @@ Sitemap: ${baseUrl}/sitemap.xml`;
   server.get('**', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
+    // Create environment variables object
+    const envVars = {
+      production: true,
+      apiUrl: process.env['API_URL'] || 'https://api.yourblogdomain.com/api',
+      baseUrl: process.env['BASE_URL'] || 'https://www.yourblogdomain.com',
+      siteName: 'SmartHome Blog',
+      siteDescription: 'Your source for smart home technology and automation',
+      defaultImage: 'https://yourdomain.com/images/default-blog-image.jpg'
+    };
+
     commonEngine
       .render({
         bootstrap: AppServerModule,
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+        providers: [
+          { provide: APP_BASE_HREF, useValue: baseUrl },
+          { provide: 'ENV_VARS', useValue: envVars }
+        ],
       })
       .then((html) => res.send(html))
       .catch((err) => next(err));
