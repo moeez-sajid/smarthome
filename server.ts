@@ -36,6 +36,7 @@ export function app(): express.Express {
 
   // Robots.txt route
   server.get('/robots.txt', (req, res) => {
+    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
     const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin/
@@ -43,7 +44,7 @@ Disallow: /api/
 Disallow: /search/
 Disallow: /auth/
 
-Sitemap: http://localhost:4200/sitemap.xml`;
+Sitemap: ${baseUrl}/sitemap.xml`;
 
     res.set('Content-Type', 'text/plain');
     res.send(robotsTxt);
@@ -51,7 +52,7 @@ Sitemap: http://localhost:4200/sitemap.xml`;
 
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
-    const baseUrl = `http://localhost:4200`;
+    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
     
     // Start XML structure
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
