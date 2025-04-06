@@ -9,7 +9,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-import { EnvironmentService } from '../../services/environment.service';
 
 @Component({
   selector: 'app-blog-post',
@@ -37,8 +36,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     private location: Location,
     private seoService: SeoService,
     private title: Title,
-    private meta: Meta,
-    private environmentService: EnvironmentService
+    private meta: Meta
   ) { }
 
   async ngOnInit() {

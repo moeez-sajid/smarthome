@@ -12,9 +12,9 @@ let cachedPosts: any = [];
 // Function to fetch and cache blog posts
 async function fetchAndCachePosts() {
   try {
-    const apiUrl = process.env['API_URL'] || 'http://localhost:3000';
-    const response = await axios.get(`${apiUrl}/api/blogs`);
+    const response = await axios.get('http://localhost:3000/api/blogs');
     cachedPosts = response.data.blogs;
+    console.log('res',response.data.blogs)
     console.log(`Successfully cached ${cachedPosts.length} blog posts`);
   } catch (error) {
     console.error('Error fetching blog posts:', error);
@@ -36,7 +36,6 @@ export function app(): express.Express {
 
   // Robots.txt route
   server.get('/robots.txt', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
     const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin/
@@ -44,7 +43,7 @@ Disallow: /api/
 Disallow: /search/
 Disallow: /auth/
 
-Sitemap: ${baseUrl}/sitemap.xml`;
+Sitemap: http://localhost:4200/sitemap.xml`;
 
     res.set('Content-Type', 'text/plain');
     res.send(robotsTxt);
@@ -52,7 +51,7 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
+    const baseUrl = `http://localhost:4200`;
     
     // Start XML structure
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -97,26 +96,13 @@ Sitemap: ${baseUrl}/sitemap.xml`;
   server.get('**', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
-    // Create environment variables object
-    const envVars = {
-      production: true,
-      apiUrl: process.env['API_URL'] || 'https://api.yourblogdomain.com/api',
-      baseUrl: process.env['BASE_URL'] || 'https://www.yourblogdomain.com',
-      siteName: 'SmartHome Blog',
-      siteDescription: 'Your source for smart home technology and automation',
-      defaultImage: 'https://yourdomain.com/images/default-blog-image.jpg'
-    };
-
     commonEngine
       .render({
         bootstrap: AppServerModule,
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: browserDistFolder,
-        providers: [
-          { provide: APP_BASE_HREF, useValue: baseUrl },
-          { provide: 'ENV_VARS', useValue: envVars }
-        ],
+        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
       })
       .then((html) => res.send(html))
       .catch((err) => next(err));

@@ -36,11 +36,6 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              {
-                "glob": "**/*",
-                "input": "src/environments",
-                "output": "/environments"
               }
             ],
             "styles": [
