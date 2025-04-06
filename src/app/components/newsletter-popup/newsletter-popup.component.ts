@@ -1,6 +1,8 @@
 import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { NewsletterService } from '../../services/newsletter.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-newsletter-popup',
@@ -15,6 +17,7 @@ export class NewsletterPopupComponent implements OnInit {
   showPopup = false;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private newsletterService: NewsletterService,
     private fb: FormBuilder,
     private elementRef: ElementRef
@@ -25,13 +28,14 @@ export class NewsletterPopupComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Check if user has already seen the popup
-    const hasSeenPopup = localStorage.getItem('hasSeenNewsletterPopup');
-    if (!hasSeenPopup) {
-      // Show popup after 5 seconds
-      setTimeout(() => {
-        this.showPopup = true;
-      }, 5000);
+    if (isPlatformBrowser(this.platformId)) {
+      const hasSeenPopup = localStorage.getItem('hasSeenNewsletterPopup');
+      if (!hasSeenPopup) {
+        // Show popup after 5 seconds
+        setTimeout(() => {
+          this.showPopup = true;
+        }, 5000);
+      }
     }
   }
 
@@ -76,7 +80,9 @@ export class NewsletterPopupComponent implements OnInit {
   }
 
   closePopup() {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('hasSeenNewsletterPopup', 'true');
+    }
     this.showPopup = false;
-    localStorage.setItem('hasSeenNewsletterPopup', 'true');
   }
 } 

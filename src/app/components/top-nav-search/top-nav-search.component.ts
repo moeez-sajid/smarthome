@@ -111,9 +111,7 @@ export class TopNavSearchComponent implements OnInit {
   removeRecentSearch(index: number, event: Event): void {
     event.stopPropagation();
     this.recentSearches.splice(index, 1);
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));
-    }
+    this.saveRecentSearches();
   }
 
   getCategoryName(categoryId: string): string {
@@ -133,6 +131,11 @@ export class TopNavSearchComponent implements OnInit {
       this.recentSearches = this.recentSearches.slice(0, 5);
     }
     
+    // Save to localStorage only in browser environment
+    this.saveRecentSearches();
+  }
+
+  private saveRecentSearches() {
     // Save to localStorage only in browser environment
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches));

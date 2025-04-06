@@ -1,10 +1,12 @@
-import { Component, OnInit, ElementRef, ViewChildren, QueryList, AfterViewInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChildren, QueryList, AfterViewInit, Renderer2, ViewChild, Inject } from '@angular/core';
 import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Location } from '@angular/common';
 import { SeoService } from '../../services/seo.service';
 import { Blog, BlogSection, ContentBlock } from '../../models/blog.model';
 import { Category } from '../../models/category.model';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-blog-post',
@@ -23,6 +25,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   @ViewChild('blogContent') blogContentElement!: ElementRef;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute,
     private router: Router,
     private blogDataService: BlogDataService,
@@ -55,7 +58,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
       if (event instanceof NavigationStart) {
         // Store previous URL if it's the blog list page
         if (event.url.includes('/blogs') && !event.url.includes('/blog/')) {
-          localStorage.setItem('blogListUrl', event.url);
+          this.onUrlChange(event);
         }
       }
     });
@@ -194,5 +197,11 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   getCategoryName(categoryId: string): string {
     const category = this.blogDataService.getCategoryById(categoryId);
     return category ? category.name : 'Uncategorized';
+  }
+
+  onUrlChange(event: any) {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('blogListUrl', event.url);
+    }
   }
 }

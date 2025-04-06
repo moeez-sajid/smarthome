@@ -1,19 +1,16 @@
 {
   "name": "smarthome",
   "version": "0.0.0",
- "scripts": {
-  "ng": "ng",
-  "start": "ng serve",
-  "build": "ng build",
-  "watch": "ng build --watch --configuration development",
-  "test": "ng test",
-
-  "build:ssr": "ng build && ng run smarthome:server",
-  "serve:ssr": "node dist/smarthome/server/server.mjs",
-  "prerender": "ng run smarthome:prerender"
-}
-
-,
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "build:ssr": "ng build && ng run smarthome:server",
+    "serve:ssr": "node dist/smarthome/server/server.mjs",
+    "prerender": "ng run smarthome:prerender"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^18.1.0",
