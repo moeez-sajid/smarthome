@@ -12,7 +12,7 @@ let cachedPosts: any = [];
 // Function to fetch and cache blog posts
 async function fetchAndCachePosts() {
   try {
-    const response = await axios.get('http://localhost:3000/api/blogs');
+    const response = await axios.get('https://smarthope-api-eacdda4ffb2f.herokuapp.com/api/blogs');
     cachedPosts = response.data.blogs;
     console.log('res',response.data.blogs)
     console.log(`Successfully cached ${cachedPosts.length} blog posts`);
@@ -36,7 +36,7 @@ export function app(): express.Express {
 
   // Robots.txt route
   server.get('/robots.txt', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
+    const baseUrl = process.env['BASE_URL'] || 'https://smarthome-fe-1b9270f2e871.herokuapp.com';
     const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin/
@@ -52,7 +52,7 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
+    const baseUrl = process.env['BASE_URL'] || 'https://smarthome-fe-1b9270f2e871.herokuapp.com';
     
     // Start XML structure
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';

@@ -83,16 +83,12 @@ export class BlogDataService {
     }
   }
 
-  async getBlogBySlug(slug: string): Promise<Blog | undefined> {
-    try {
-      const blog = await firstValueFrom(
-        this.httpClient.get<Blog>(`http://localhost:3000/api/blogs/${slug}`)
-      );
-      return blog;
-    } catch (error) {
-      console.error(`Blog not found for slug: ${slug}`, error);
-      return undefined;
-    }
+  getBlogBySlug(slug: string): Observable<Blog> {
+    return this.httpClient.get<Blog>(`${environment.apiUrl}/blogs/${slug}`);
+  }
+
+  getBlogs(params: any): Observable<any> {
+    return this.httpClient.get<any>(`${environment.apiUrl}/blogs`, { params });
   }
 
   async getRelatedBlogs(blogId: string, categoryId: string, limit: number = 3): Promise<Blog[]> {

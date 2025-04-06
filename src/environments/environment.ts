@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
-  baseUrl: 'http://localhost:4200',
+  apiUrl: 'https://smarthope-api-eacdda4ffb2f.herokuapp.com/api',
+  baseUrl: 'https://smarthome-fe-1b9270f2e871.herokuapp.com',
   siteName: 'SmartHome Blog',
   siteDescription: 'Your source for smart home technology and automation',
-  defaultImage: 'https://yourdomain.com/images/default-blog-image.jpg'
+  defaultImage: 'https://smarthome-fe-1b9270f2e871.herokuapp.com/assets/images/default-blog-image.jpg'
 }; 
