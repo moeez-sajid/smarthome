@@ -8,11 +8,15 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "dev:ssr": "ng run smarthome:serve-ssr",
-    "build:ssr": "ng build --configuration production",
+    "build:ssr": "ng build --configuration production && ng run smarthome:server:production",
     "serve:ssr": "node dist/smarthome/server/server.mjs",
-    "prerender": "ng run smarthome:prerender"
+    "prerender": "ng run smarthome:prerender",
+    "postinstall": "npm run build:ssr"
   },
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@angular/animations": "^18.1.0",
     "@angular/common": "^18.1.0",
