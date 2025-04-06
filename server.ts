@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import axios from 'axios';
 import AppServerModule from './src/main.server';
+import { environment } from './src/environments/environment.server';
 
 // Global cache for blog posts
 let cachedPosts: any = [];
@@ -12,9 +13,8 @@ let cachedPosts: any = [];
 // Function to fetch and cache blog posts
 async function fetchAndCachePosts() {
   try {
-    const response = await axios.get('http://localhost:3000/api/blogs');
+    const response = await axios.get(`${environment.apiUrl}/blogs`);
     cachedPosts = response.data.blogs;
-    console.log('res',response.data.blogs)
     console.log(`Successfully cached ${cachedPosts.length} blog posts`);
   } catch (error) {
     console.error('Error fetching blog posts:', error);
@@ -43,7 +43,7 @@ Disallow: /api/
 Disallow: /search/
 Disallow: /auth/
 
-Sitemap: http://localhost:4200/sitemap.xml`;
+Sitemap: ${environment.baseUrl}/sitemap.xml`;
 
     res.set('Content-Type', 'text/plain');
     res.send(robotsTxt);
@@ -51,15 +51,13 @@ Sitemap: http://localhost:4200/sitemap.xml`;
 
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
-    const baseUrl = `http://localhost:4200`;
-    
     // Start XML structure
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     
     // Add homepage
     xml += '  <url>\n';
-    xml += `    <loc>${baseUrl}</loc>\n`;
+    xml += `    <loc>${environment.baseUrl}</loc>\n`;
     xml += '    <changefreq>daily</changefreq>\n';
     xml += '  </url>\n';
     
@@ -68,7 +66,7 @@ Sitemap: http://localhost:4200/sitemap.xml`;
       cachedPosts.forEach(post => {
         if (post && typeof post === 'object' && post.slug) {
           xml += '  <url>\n';
-          xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
+          xml += `    <loc>${environment.baseUrl}/blog/${post.slug}</loc>\n`;
           if (post.updatedAt) {
             xml += `    <lastmod>${new Date(post.updatedAt).toISOString()}</lastmod>\n`;
           }
