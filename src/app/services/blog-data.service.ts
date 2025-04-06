@@ -110,7 +110,38 @@ export class BlogDataService {
   }
 
   async filterByCategory(categoryId: string | null): Promise<void> {
-    await this.loadBlogsFromServer(categoryId, 1);
+    await this.loadBlogsFromServer(categoryId);
+  }
+
+  async filterByDateRange(startDate: Date | null, endDate: Date | null): Promise<void> {
+    try {
+      let params = new HttpParams()
+        .set('status', 'published')
+        .set('page', '1')
+        .set('limit', this.paginationInfoSubject.value.itemsPerPage.toString());
+
+      if (startDate) {
+        params = params.set('startDate', startDate.toISOString());
+      }
+      if (endDate) {
+        params = params.set('endDate', endDate.toISOString());
+      }
+
+      const res = await firstValueFrom(
+        this.httpClient.get<any>(`${environment.apiUrl}/blogs`, { params })
+      );
+
+      this.blogsToDisplaySubject.next(res.blogs);
+      this.paginationInfoSubject.next({
+        currentPage: res.pagination.page,
+        itemsPerPage: res.pagination.limit,
+        totalItems: res.pagination.total,
+        totalPages: res.pagination.pages
+      });
+    } catch (error) {
+      console.error('Failed to filter blogs by date range', error);
+      this.blogsToDisplaySubject.next([]);
+    }
   }
 
   async setPage(page: number): Promise<void> {
