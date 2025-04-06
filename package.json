@@ -10,7 +10,8 @@
     "dev:ssr": "ng run smarthome:serve-ssr",
     "build:ssr": "ng build --configuration production",
     "serve:ssr": "node dist/smarthome/server/server.mjs",
-    "prerender": "ng run smarthome:prerender"
+    "prerender": "ng run smarthome:prerender",
+    "heroku-prebuild": "npm install @nguniversal/express-engine@16.2.0"
   },
   "private": true,
   "engines": {
