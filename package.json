@@ -8,11 +8,17 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "dev:ssr": "ng run smarthome:serve-ssr",
-    "build:ssr": "ng build --configuration production",
+    "build:ssr": "ng build --configuration production && ng run smarthome:server:production",
     "serve:ssr": "node dist/smarthome/server/server.mjs",
-    "prerender": "ng run smarthome:prerender"
+    "prerender": "ng run smarthome:prerender",
+    "heroku-postbuild": "npm run build:ssr",
+    "heroku-prebuild": "npm install"
   },
   "private": true,
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
   "dependencies": {
     "@angular/animations": "^18.1.0",
     "@angular/common": "^18.1.0",
@@ -26,6 +32,7 @@
     "@angular/ssr": "^18.1.4",
     "@nguniversal/express-engine": "^18.1.0",
     "axios": "^1.8.4",
+    "compression": "^1.7.4",
     "express": "^4.18.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
