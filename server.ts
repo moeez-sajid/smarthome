@@ -113,8 +113,6 @@ Sitemap: http://localhost:4200/sitemap.xml`;
 
 function run(): void {
   const port = process.env['PORT'] || 4000;
-  const baseUrl = process.env['BASE_URL'] || 'http://localhost:4200';
-  const apiUrl = process.env['API_URL'] || 'http://localhost:3000/api';
 
   // Fetch posts before starting the server
   fetchAndCachePosts()
@@ -122,7 +120,7 @@ function run(): void {
       // Start up the Node server
       const server = app();
       server.listen(port, () => {
-        console.log(`Node Express server listening on port ${port}`);
+        console.log(`Node Express server listening on http://localhost:${port}`);
       });
     })
     .catch(error => {

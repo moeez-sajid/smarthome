@@ -1,5 +1,0 @@
-build:
-  config:
-    NODE_ENV: production
-  buildpacks:
-    - heroku/nodejs 
