@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node dist/smarthome/server/server.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -11,8 +11,7 @@
     "build:ssr": "ng build --configuration production && ng run smarthome:server:production",
     "serve:ssr": "node dist/smarthome/server/server.mjs",
     "prerender": "ng run smarthome:prerender",
-    "heroku-postbuild": "npm run build:ssr",
-    "heroku-prebuild": "npm install"
+    "postinstall": "ng build --configuration production && ng run smarthome:server:production"
   },
   "private": true,
   "engines": {

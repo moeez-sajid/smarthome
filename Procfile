@@ -1,1 +1,1 @@
-web: node dist/smarthome/server/server.mjs 
+web: npm start 
