@@ -8,7 +8,6 @@ out-tsc/
 node_modules/
 
 # Environment files
-src/environments/environment*.ts
 
 # Angular build cache
 .angular/cache/
