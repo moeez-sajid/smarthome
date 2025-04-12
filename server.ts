@@ -36,7 +36,7 @@ export function app(): express.Express {
 
   // Robots.txt route
   server.get('/robots.txt', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'https://smarthome-fe-1b9270f2e871.herokuapp.com';
+    const baseUrl = process.env['BASE_URL'] || 'https://www.smarthometipsguide.com';
     const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /admin/
@@ -52,7 +52,7 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'https://smarthome-fe-1b9270f2e871.herokuapp.com';
+    const baseUrl = process.env['BASE_URL'] || 'https://www.smarthometipsguide.com';
     
     // Start XML structure
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
