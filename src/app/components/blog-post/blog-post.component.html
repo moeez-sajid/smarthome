@@ -7,32 +7,27 @@
   <div class="ad-container top-ad">
     <div class="ad-placeholder">
       <span>Advertisement</span>
-      <!-- Google AdSense code would go here -->
     </div>
   </div>
 
   <div class="blog-post" [ngClass]="getLayoutClass()">
-    <!-- Article Index Sidebar -->
     <div class="article-index">
       <h3>In This Article</h3>
       <ul>
-        <li *ngFor="let heading of sectionHeadings">
-          <a [ngClass]="{'active': currentSection === heading.id}" 
-             (click)="scrollToSection(heading.id)">{{ heading.heading }}</a>
+        <li *ngFor="let heading of sectionHeadings;index as i">
+          <a  [ngClass]="{'active': currentSection === heading.id}" (click)="scrollToSection(heading.heading)">
+            {{ heading.heading }}
+          </a>
         </li>
       </ul>
-
-      <!-- Sidebar Ad Space -->
       <div class="ad-container sidebar-ad">
         <div class="ad-placeholder">
           <span>Advertisement</span>
-          <!-- Google AdSense code would go here -->
         </div>
       </div>
     </div>
-    
-    <!-- Blog Content -->
-    <div class="blog-content" #blogContent>
+
+    <div class="blog-content" [ngClass]="getLayoutClass()">
       <!-- Blog Header -->
       <div class="blog-header">
         <div class="blog-metadata">
@@ -42,138 +37,161 @@
         </div>
         <h1 class="blog-title">{{ blog.title }}</h1>
         <p class="blog-description">{{ blog.description }}</p>
-        
-        <!-- Featured Image -->
-        <div class="featured-image" *ngIf="blog.headerImage">
+
+        <div class="featured-image" *ngIf="blog?.headerImage">
           <img [src]="blog.headerImage" [alt]="blog.title">
         </div>
-        
-        <!-- Tags -->
-        <div class="blog-tags" *ngIf="blog.tags && blog.tags.length > 0">
+
+        <div class="blog-tags" *ngIf="blog?.tags?.length">
           <span class="tag" *ngFor="let tag of blog.tags">#{{ tag }}</span>
         </div>
       </div>
 
-      <!-- Content Based on Blog Types -->
-      <div [ngClass]="{'tutorial-content': layoutType === 'tutorial', 'review-content': layoutType === 'product-review'}">
-        <!-- For blogs with traditional sections -->
-        <ng-container *ngIf="blog.sections && (!blog.contentBlocks || blog.contentBlocks.length === 0)">
-          <div *ngFor="let section of blog.sections; let i = index" [id]="'section-' + i" class="blog-section" #section>
-            <h2 class="section-heading">{{ section.heading }}</h2>
-            <div class="section-content" [innerHTML]="section.content"></div>
-          </div>
-        </ng-container>
-        
-        <!-- For blogs with content blocks -->
-        <ng-container *ngIf="blog.contentBlocks && blog.contentBlocks.length > 0">
-          <!-- Introduction section if exists -->
-          <div *ngFor="let section of blog.sections; let i = index" [id]="'section-' + i" class="blog-section" #section>
-            <h2 class="section-heading">{{ section.heading }}</h2>
-            <div class="section-content" [innerHTML]="section.content"></div>
-          </div>
-          
-          <!-- Dynamic Content Blocks -->
-          <div *ngFor="let block of getAllContentBlocks(); let i = index" [id]="'block-' + i" class="content-block" [ngClass]="'block-' + block.type" #section>
-            <h2 *ngIf="block.heading" class="block-heading">{{ block.heading }}</h2>
-            
-            <!-- Text Block -->
-            <div *ngIf="block.type === 'text'" class="text-block">
-              <div class="block-content" [innerHTML]="block.content"></div>
+      <div class="content-blocks">
+        <ng-container *ngFor="let block of blog.contentBlocks; let i = index">
+
+          <!-- Heading -->
+          <ng-container *ngIf="block.type === 'heading' && getHeading(block) as heading">
+            <div [id]="heading.text" class="block-heading">
+              <h2>{{ heading.text }}</h2>
             </div>
-            
-            <!-- Image Block -->
-            <div *ngIf="block.type === 'image'" class="image-block">
-              <img [src]="block.imageUrl" [alt]="block.imageAlt || ''" class="block-image">
-              <p *ngIf="block.content" class="image-caption" [innerHTML]="block.content"></p>
+          </ng-container>
+
+          <!-- Text Break -->
+          <div *ngIf="block.type === 'text-break'" class="content-block text-break">
+            <hr>
+          </div>
+
+          <!-- Content Break -->
+          <div *ngIf="block.type === 'content-break'" class="content-block content-break">
+            <div class="break-line"></div>
+          </div>
+
+          <!-- Image -->
+          <ng-container *ngIf="block.type === 'image' && getImage(block) as image">
+            <div class="image-block">
+              <img [src]="image.url" [alt]="image.alt">
+              <p *ngIf="image.caption" class="caption">{{ image.caption }}</p>
             </div>
-            
-            <!-- Product Block -->
-            <div *ngIf="block.type === 'product'" class="product-block">
-              <div *ngIf="block.content" class="block-content" [innerHTML]="block.content"></div>
-              
-              <div class="product-cards" *ngIf="block.products && block.products.length > 0">
-                <div *ngFor="let product of block.products" class="product-card">
-                  <div class="product-image" *ngIf="product.image">
-                    <img [src]="product.image" [alt]="product.title">
-                  </div>
-                  <div class="product-details">
-                    <h3 class="product-title">{{ product.title }}</h3>
-                    <p class="product-description" *ngIf="product.description">{{ product.description }}</p>
-                    <div class="product-price" *ngIf="product.price">{{ formatPrice(product.price) }}</div>
-                    <div class="product-rating" *ngIf="product.rating">
-                      <div class="stars">
-                        <span *ngFor="let star of getRatingStars(product.rating)" class="star">★</span>
-                        <span *ngIf="getPartialStar(product.rating) > 0" class="star partial" [style.width.%]="getPartialStar(product.rating) * 100">★</span>
-                      </div>
-                      <span class="rating-value">{{ product.rating }}/5</span>
-                    </div>
-                    <a *ngIf="product.link" [href]="product.link" class="product-link" target="_blank" rel="noopener noreferrer">View on Amazon</a>
-                  </div>
-                </div>
+          </ng-container>
+
+          <!-- Video -->
+          <ng-container *ngIf="block.type === 'video' && getVideo(block) as video">
+            <!-- Video Block -->
+            <div class="video-block">
+              <div class="video-container">
+                <iframe [src]="video.url " frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen></iframe>
               </div>
+              <p *ngIf="video.caption" class="video-caption" [innerHTML]="video.caption"></p>
             </div>
-            
-            <!-- Quote Block -->
-            <div *ngIf="block.type === 'quote'" class="quote-block">
+          </ng-container>
+
+          <!-- Quote -->
+          <ng-container *ngIf="block.type === 'quote' && getQuote(block) as quote">
+            <div class="quote-block">
               <blockquote>
-                <p [innerHTML]="block.content"></p>
-                <footer *ngIf="block.attribution">{{ block.attribution }}</footer>
+                <p>{{ quote.text }}</p>
+                <footer *ngIf="quote.author">— {{ quote.author }}</footer>
               </blockquote>
             </div>
-            
-            <!-- Video Block -->
-            <div *ngIf="block.type === 'video'" class="video-block">
-              <div class="video-container">
-                <iframe [src]="block.videoUrl | safe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+          </ng-container>
+
+          <!-- Product -->
+          <ng-container *ngIf="block.type === 'product' && getProduct(block) as product">
+            <div class="product-block">
+              <div class="product-card">
+                <img *ngIf="product.image" [src]="product.image" [alt]="product.title">
+                <h3>{{ product.title }}</h3>
+                <p *ngIf="product.description">{{ product.description }}</p>
+                <div class="product-meta">
+                  <span *ngIf="product.price" class="price">{{ formatPrice(product.price) }}</span>
+                  <div *ngIf="product.rating" class="rating">
+                    <span *ngFor="let star of getRatingStars(product.rating)" class="star">★</span>
+                    <span *ngIf="getPartialStar(product.rating) > 0" class="partial-star"
+                      [style.width.%]="getPartialStar(product.rating) * 100">★</span>
+                  </div>
+                </div>
+                <a *ngIf="product.link" [href]="product.link" target="_blank" class="buy-button">Buy Now</a>
               </div>
-              <p *ngIf="block.content" class="video-caption" [innerHTML]="block.content"></p>
             </div>
-            
-            <!-- Code Block -->
-            <div *ngIf="block.type === 'code'" class="code-block">
-              <pre><code [class]="block.language">{{ block.code }}</code></pre>
-              <p *ngIf="block.content" class="code-description" [innerHTML]="block.content"></p>
+          </ng-container>
+
+          <!-- Code -->
+          <ng-container *ngIf="block.type === 'code' && getCode(block) as code">
+            <div class="content-block code">
+              <button class="copy-btn" (click)="copyToClipboard(code.code)">Copy</button>
+              <pre><code [class]="'language-' + code.language">{{ code.code }}</code></pre>
             </div>
-            
-            <!-- Comparison Table Block -->
-            <div *ngIf="block.type === 'comparison-table'" class="comparison-table-block">
+          </ng-container>
+
+
+          <!-- Comparison Table -->
+          <ng-container *ngIf="block.type === 'comparison-table' && getComparisonTable(block) as table">
+            <div class="comparison-table-block">
               <table>
                 <thead>
                   <tr>
-                    <th *ngFor="let header of block.tableData?.headers">{{ header }}</th>
+                    <th *ngFor="let header of table.headers">{{ header }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let row of block.tableData?.rows">
+                  <tr *ngFor="let row of table.rows">
                     <td *ngFor="let cell of row">{{ cell }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            
-            <!-- List Block -->
-            <div *ngIf="block.type === 'list'" class="list-block">
+          </ng-container>
+
+          <!-- Numbered List -->
+          <ng-container *ngIf="block.type === 'numbered-list' && getNumberedList(block) as list">
+            <div class="numbered-list-block">
+              <ol>
+                <li *ngFor="let item of list.items" [innerHTML]="item"></li>
+              </ol>
+            </div>
+          </ng-container>
+
+          <!-- Unordered List -->
+          <ng-container *ngIf="block.type === 'unordered-list' && getUnorderedList(block) as list">
+            <div class="unordered-list-block">
               <ul>
-                <li *ngFor="let item of block.items">
-                  <span [innerHTML]="item.text"></span>
-                  <a *ngIf="item.link" [href]="item.link" target="_blank" rel="noopener noreferrer">Learn more</a>
-                </li>
+                <li *ngFor="let item of list.items" [innerHTML]="item"></li>
               </ul>
             </div>
-          </div>
+          </ng-container>
+          <!-- Text -->
+          <ng-container *ngIf="block.type === 'text' && getText(block) as text">
+            <div class="text-block" [ngClass]="text.format">
+              <div [innerHTML]="text.content"></div>
+            </div>
+          </ng-container>
+          <!-- Internal Article Link -->
+          <ng-container *ngIf="block.type === 'internal-article-link' && getInternalArticleLink(block) as link">
+            <div class="content-block internal-article-link">
+              <a [routerLink]="link.link.replace(locations.origin, '')">
+                {{ link.text }}
+              </a>
+            </div>
+          </ng-container>
         </ng-container>
       </div>
     </div>
   </div>
 
   <!-- Related Articles -->
-  <div class="related-articles" *ngIf="relatedBlogs.length > 0">
+  <div class="related-articles" *ngIf="relatedBlogs?.length">
     <h2>Related Articles</h2>
     <div class="related-grid">
       <div *ngFor="let relatedBlog of relatedBlogs" class="related-card">
-        <h3>{{ relatedBlog.title }}</h3>
-        <p>{{ relatedBlog.description }}</p>
-        <a [routerLink]="['/blog', relatedBlog.slug]">Read More</a>
+        <div class="blog-category">{{ relatedBlog.category.name }}</div>
+        <h3 class="blog-title">{{ relatedBlog.title }}</h3>
+        <div class="blog-date">{{ relatedBlog.publishDate | date:'longDate' }}</div>
+        <p class="blog-excerpt">{{ relatedBlog.description }}</p>
+        <a (click)="navigateToBlog(relatedBlog.slug)" class="read-more">Read More</a>
       </div>
     </div>
   </div>
@@ -182,12 +200,11 @@
   <div class="ad-container bottom-ad">
     <div class="ad-placeholder">
       <span>Advertisement</span>
-      <!-- Google AdSense code would go here -->
     </div>
   </div>
 </div>
 
-<!-- Show message if blog not found -->
+<!-- Fallback if blog not found -->
 <div class="not-found" *ngIf="!blog">
   <h2>Blog post not found</h2>
   <p>The article you're looking for doesn't exist or has been removed.</p>

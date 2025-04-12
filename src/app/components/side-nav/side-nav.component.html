@@ -56,4 +56,15 @@
       <p>Google AdSense (250×250)</p>
     </div>
   </div>
+
+  <div class="table-of-contents" *ngIf="tableOfContents.length > 0">
+    <h3>Table of Contents</h3>
+    <ul>
+      <li *ngFor="let item of tableOfContents">
+        <a [routerLink]="[]" [fragment]="item.id" >
+          {{ item.text }}
+        </a>
+      </li>
+    </ul>
+  </div>
 </div>

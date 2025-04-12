@@ -1,3 +1,4 @@
+import { SafeResourceUrl } from "@angular/platform-browser";
 import { Category } from "./category.model";
 
 export interface ProductItem {
@@ -9,36 +10,56 @@ export interface ProductItem {
   rating?: number;
   specs?: Map<string, string>;
 }
-
-export interface ContentBlock {
-  type: 'text' | 'image' | 'product' | 'quote' | 'video' | 'code' | 'comparison-table' | 'list';
-  heading?: string;
-  content?: string;
-  products?: ProductItem[];
-  imageUrl?: string;
-  imageAlt?: string;
-  videoUrl?: string;
-  code?: string;
-  language?: string;
-  items?: Array<{
-    text: string;
-    link?: string;
-  }>;
-  tableData?: {
-    headers: string[];
-    rows: any[][];
-  };
-  attribution?: string;
+export interface heading {
+  text: string;
+  link?: string;
 }
-
-export interface BlogSection {
-  heading: string;
+export interface image {
+  url: string;
+  alt: string;
+  caption?: string;
+  link?: string;
+}
+export interface video {
+  url: SafeResourceUrl;
+  caption?: string;
+  link?: string;
+}
+export interface quote {
+  text: string;
+  author?: string;
+  link?: string;
+}
+export interface comparisonTable {
+  headers: string[];
+  rows: any[][];
+}
+export interface numberedList {
+  items: string[];
+}
+export interface unorderedList {
+  items: string[];
+}
+export interface internalArticleLink {
+  text: string;
+  link: string;
+}
+export interface code {
+  language?: string;
+  code: string;
+}
+export interface text {
   content: string;
-  contentBlocks?: ContentBlock[];
+  format?: 'paragraph' | 'blockquote' | 'pre';
+}
+export interface ContentBlock {
+  type: 'heading' | 'text' | 'content-break' | 'text-break' | 'image' | 'video' | 'quote' | 'product' | 'code' | 'comparison-table' | 'numbered-list' | 'unordered-list' | 'product-carousel' | 'recommended-products' | 'internal-article-link';
+  content?: string | heading | ProductItem | ProductItem[] | image | video | quote | comparisonTable | numberedList | unorderedList | internalArticleLink | text;
+  makeTableOfContents?: boolean;
 }
 
 export interface Blog {
-  id: string;
+  _id: string;
   title: string;
   content: string;
   category: Category; // Category ID
@@ -55,7 +76,6 @@ export interface Blog {
   featured: boolean;
   template?: 'standard' | 'product-review' | 'tutorial' | 'news' | 'comparison';
   headerImage?: string;
-  sections?: BlogSection[];
   contentBlocks?: ContentBlock[];
   recommendations?: ProductItem[];
   isDeleted: boolean;

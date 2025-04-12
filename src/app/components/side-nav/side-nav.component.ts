@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Category } from '../../models/category.model';
+import { Blog, ContentBlock } from '../../models/blog.model';
 
 @Component({
   selector: 'app-side-nav',
@@ -8,17 +9,36 @@ import { Category } from '../../models/category.model';
   styleUrls: ['./side-nav.component.scss']
 })
 export class SideNavComponent implements OnInit {
+  @Input() blog: Blog | null = null;
   categories: Category[] = [];
   isExpanded = false;
   selectedCategory: string | null = null;
   startDate: string | null = null;
   endDate: string | null = null;
+  tableOfContents: { id: string; text: string }[] = [];
   private dateChangeTimeout: any;
 
   constructor(private blogDataService: BlogDataService) {}
 
   async ngOnInit() {
     this.categories = await this.blogDataService.getCategoriesFromServer();
+    if (this.blog) {
+      this.generateTableOfContents();
+    }
+  }
+
+  private generateTableOfContents() {
+    if (!this.blog?.contentBlocks) return;
+    
+    this.tableOfContents = this.blog.contentBlocks
+      .filter(block => block.type === 'heading' && block.makeTableOfContents)
+      .map((block, index) => {
+        const heading = block.content as { text: string; link?: string };
+        return {
+          id: `heading-${index}`,
+          text: heading.text
+        };
+      });
   }
 
   toggleExpand() {

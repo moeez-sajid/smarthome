@@ -29,7 +29,7 @@
       <h2 class="blog-title">{{ blog.title }}</h2>
       <div class="blog-date">{{ formatDate(blog.publishDate) }}</div>
       <p class="blog-excerpt">{{ blog.description }}</p>
-      <a [routerLink]="['/blog', blog.slug]" class="read-more">Read More</a>
+      <a (click)="navigateToBlog(blog.slug)" class="read-more">Read More</a>
     </div>
   </div>
   

@@ -3,13 +3,25 @@ import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Location } from '@angular/common';
 import { SeoService } from '../../services/seo.service';
-import { Blog, BlogSection, ContentBlock } from '../../models/blog.model';
+import { Blog, ContentBlock } from '../../models/blog.model';
 import { Category } from '../../models/category.model';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
-import { Title, Meta } from '@angular/platform-browser';
+import { Title, Meta, DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
-
+import {
+  heading,
+  image,
+  video,
+  quote,
+  code,
+  comparisonTable,
+  numberedList,
+  unorderedList,
+  ProductItem,
+  internalArticleLink,
+  text
+} from '../../models/blog.model';
 @Component({
   selector: 'app-blog-post',
   templateUrl: './blog-post.component.html',
@@ -22,7 +34,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   sectionHeadings: { id: string; heading: string }[] = [];
   currentSection: string = '';
   layoutType: 'standard' | 'featured' | 'product-review' | 'tutorial' | 'news' | 'comparison' = 'standard';
-  
+  locations = window.location;
   @ViewChildren('section') sectionElements!: QueryList<ElementRef>;
   @ViewChild('blogContent') blogContentElement!: ElementRef;
 
@@ -36,16 +48,19 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     private location: Location,
     private seoService: SeoService,
     private title: Title,
-    private meta: Meta
+    private meta: Meta,private sanitizer: DomSanitizer
   ) { }
-
+  navigateToBlog(slug: string): void {
+   window.location.href = this.locations.origin + '/blog/' + slug
+  }
   async ngOnInit() {
     // Get the resolved blog post data
     this.blog = this.route.snapshot.data['post'];
     
     if (this.blog) {
       this.category = this.blogDataService.getCategoryById(this.blog.category._id);
-      this.relatedBlogs = await this.blogDataService.getRelatedBlogs(this.blog.id, this.blog.category.name);
+      this.relatedBlogs = (await this.blogDataService.getRelatedBlogs(this.blog._id, this.blog.category._id));
+      console.log(this.relatedBlogs,'ssssssssss')
       this.determineLayoutType();
       this.extractSectionHeadings();
       
@@ -78,30 +93,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
 
   private setMetaTags() {
     if (!this.blog) return;
-
-    const title = this.blog.metaTitle || this.blog.title;
-    const description = this.blog.metaDescription || this.blog.description;
-    const url = `${environment.baseUrl}/blog/${this.blog.slug}`;
-    const image = this.blog.headerImage || environment.defaultImage;
-
-    // Set title
-    this.title.setTitle(`${title} | ${environment.siteName}`);
-
-    // Set meta description
-    this.meta.updateTag({ name: 'description', content: description });
-
-    // Set Open Graph tags
-    this.meta.updateTag({ property: 'og:title', content: title });
-    this.meta.updateTag({ property: 'og:description', content: description });
-    this.meta.updateTag({ property: 'og:url', content: url });
-    this.meta.updateTag({ property: 'og:type', content: 'article' });
-    this.meta.updateTag({ property: 'og:image', content: image });
-
-    // Set Twitter Card tags
-    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-    this.meta.updateTag({ name: 'twitter:title', content: title });
-    this.meta.updateTag({ name: 'twitter:description', content: description });
-    this.meta.updateTag({ name: 'twitter:image', content: image });
+    this.seoService.setPostMetaTags(this.blog);
   }
 
   ngAfterViewInit(): void {
@@ -141,12 +133,17 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
   }
 
   extractSectionHeadings(): void {
-    if (!this.blog?.sections) return;
+    if (!this.blog?.contentBlocks) return;
 
-    this.sectionHeadings = this.blog.sections.map((section: BlogSection, index: number) => ({
-      id: `section-${index}`,
-      heading: section.heading
-    }));
+    this.sectionHeadings = this.blog.contentBlocks
+      .filter(block => block.type === 'heading' && block.makeTableOfContents)
+      .map((block, index) => {
+        const heading = block.content as { text: string; link?: string };
+        return {
+          id: `heading-${index}`,
+          heading: heading.text
+        };
+      });
   }
 
   navigateBack() {
@@ -186,7 +183,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
           this.renderer.removeClass(element, 'section-focus');
         }, 2000);
       }
-    }, 100);
+    }, 200);
   }
 
   // Helper method to check if content has HTML
@@ -234,4 +231,109 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
       localStorage.setItem('blogListUrl', event.url);
     }
   }
+
+  /**
+   * Safely casts a content block's content to a specific type
+   * @param block The content block to cast
+   * @returns The typed content or undefined if not an object
+   */
+  getTypedContent<T>(block: ContentBlock): T | undefined {
+  if (block && typeof block.content === 'object' && block.content !== null) {
+    return block.content as T;
+  }
+  return undefined;
+}
+
+// Type-safe helper methods for content blocks
+getHeading(block: ContentBlock): heading | undefined {
+  if (block.type === 'heading' && typeof block.content === 'object') {
+    return block.content as heading;
+  }
+  return undefined;
+}
+
+getImage(block: ContentBlock): image | undefined {
+  if (block.type === 'image' && typeof block.content === 'object') {
+    return block.content as image;
+  }
+  return undefined;
+}
+
+getVideo(block: ContentBlock): video | undefined {
+  if (block.type === 'video' && typeof block.content === 'object') {
+    const raw = block.content as { url: string; caption?: string };
+
+    return {
+      url: this.sanitizer.bypassSecurityTrustResourceUrl(raw.url),
+      caption: raw.caption || ''
+    };
+  }
+  return undefined;
+}
+
+getQuote(block: ContentBlock): quote | undefined {
+  if (block.type === 'quote' && typeof block.content === 'object') {
+    return block.content as quote;
+  }
+  return undefined;
+}
+
+getProduct(block: ContentBlock): ProductItem | undefined {
+  if (block.type === 'product' && typeof block.content === 'object') {
+    return block.content as ProductItem;
+  }
+  return undefined;
+}
+
+getCode(block: ContentBlock): code | undefined {
+  if (block.type === 'code' && typeof block.content === 'object') {
+    return block.content as unknown as code;
+  }
+  return undefined;
+}
+
+getComparisonTable(block: ContentBlock): comparisonTable | undefined {
+  if (block.type === 'comparison-table' && typeof block.content === 'object') {
+    return block.content as comparisonTable;
+  }
+  return undefined;
+}
+
+getNumberedList(block: ContentBlock): numberedList | undefined {
+  if (block.type === 'numbered-list' && typeof block.content === 'object') {
+    return block.content as numberedList;
+  }
+  return undefined;
+}
+
+getUnorderedList(block: ContentBlock): unorderedList | undefined {
+  if (block.type === 'unordered-list' && typeof block.content === 'object') {
+    return block.content as unorderedList;
+  }
+  return undefined;
+}
+
+getInternalArticleLink(block: ContentBlock): internalArticleLink | undefined {
+  if (block.type === 'internal-article-link' && typeof block.content === 'object') {
+    return block.content as internalArticleLink;
+  }
+  return undefined;
+}
+
+getText(block: ContentBlock): text | undefined {
+  if (block.type === 'text' && typeof block.content === 'object') {
+    return block.content as text;
+  }
+  return undefined;
+}
+
+copyToClipboard(code: string): void {
+  navigator.clipboard.writeText(code).then(() => {
+    // Optionally show success message
+    console.log('Code copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy code: ', err);
+  });
+}
+
 }

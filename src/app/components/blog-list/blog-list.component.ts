@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BlogDataService, PaginationInfo } from '../../services/blog-data.service';
 import { SeoService } from '../../services/seo.service';
 import { Blog } from '../../models/blog.model';
@@ -25,6 +25,7 @@ export class BlogListComponent implements OnInit {
   constructor(
     private blogDataService: BlogDataService,
     private route: ActivatedRoute,
+    private router: Router,
     private seoService: SeoService
   ) { }
 
@@ -101,5 +102,12 @@ export class BlogListComponent implements OnInit {
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(cat => cat._id === categoryId);
     return category ? category.name : 'Uncategorized';
+  }
+
+  navigateToBlog(slug: string): void {
+    this.router.navigate(['/blog', slug]).catch(error => {
+      console.error('Navigation error:', error);
+      this.router.navigate(['/not-found']);
+    });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { Blog, BlogSection, ContentBlock } from '../models/blog.model';
+import { Blog, ContentBlock } from '../models/blog.model';
 import { Category } from '../models/category.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -91,7 +91,7 @@ export class BlogDataService {
     return this.httpClient.get<any>(`${environment.apiUrl}/blogs`, { params });
   }
 
-  async getRelatedBlogs(blogId: string, categoryId: string, limit: number = 3): Promise<Blog[]> {
+  async getRelatedBlogs(blogId: string, categoryId: string, limit: number = 3): Promise<any> {
     try {
       const params = new HttpParams()
         .set('category', categoryId)
@@ -102,7 +102,7 @@ export class BlogDataService {
         this.httpClient.get<any>('http://localhost:3000/api/blogs', { params })
       );
 
-      return res.blogs.filter((b: Blog) => b.id !== blogId).slice(0, limit);
+      return res.blogs.filter((b: Blog) => b._id !== blogId).slice(0, limit);
     } catch (error) {
       console.error('Error fetching related blogs:', error);
       return [];
