@@ -11,22 +11,23 @@
 
     <div class="categories-list" [class.expanded]="isExpanded">
       <button 
-        *ngFor="let category of categories" 
-        [class.active]="selectedCategory === category._id"
-        (click)="selectCategory(category._id)"
-      >
-        {{ category.name }}
-      </button>
-      <button 
         class="view-all" 
         [class.active]="selectedCategory === null"
         (click)="selectCategory(null)"
       >
         View All
       </button>
+      <button 
+        *ngFor="let category of categories" 
+        [class.active]="selectedCategory === category._id"
+        (click)="selectCategory(category._id)"
+      >
+        {{ category.name }}
+      </button>
+      
     </div>
   </div>
-
+<!-- 
   <div class="filters-section">
     <h3>Filters</h3>
     <div class="date-filter">
@@ -47,7 +48,7 @@
         >
       </div>
     </div>
-  </div>
+  </div> -->
   
   <!-- Sidenav Ad Space -->
   <div class="ad-container">
