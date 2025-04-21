@@ -3,7 +3,11 @@
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
-  <app-side-nav (mobileMenuToggle)="onMobileMenuToggle($event)" [isMobileOpen]="isMobileMenuOpen"></app-side-nav>
+  <app-side-nav 
+    *ngIf="isMobile || isMobileMenuOpen" 
+    [isMobileOpen]="isMobileMenuOpen"
+    (mobileMenuToggle)="onMobileMenuToggle($event)"
+  ></app-side-nav>
   <app-footer></app-footer>
   <app-newsletter-popup></app-newsletter-popup>
 </div>

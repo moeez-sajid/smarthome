@@ -36,6 +36,7 @@ export class SideNavComponent implements OnInit {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.checkMobile();
+      window.addEventListener('resize', () => this.checkMobile());
     }
     this.loadCategories();
     if (this.blog) {
