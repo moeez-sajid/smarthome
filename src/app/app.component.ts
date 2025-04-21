@@ -1,10 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'smarthome';
+  isMobileMenuOpen = false;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
+  }
 }

@@ -1,7 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, HostListener, PLATFORM_ID, Inject, Output, EventEmitter } from '@angular/core';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Category } from '../../models/category.model';
 import { Blog, ContentBlock } from '../../models/blog.model';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-side-nav',
@@ -10,6 +11,7 @@ import { Blog, ContentBlock } from '../../models/blog.model';
 })
 export class SideNavComponent implements OnInit {
   @Input() blog: Blog | null = null;
+  @Input() isMobileOpen: boolean = false;
   categories: Category[] = [];
   isExpanded = false;
   selectedCategory: string | null = null;
@@ -17,14 +19,44 @@ export class SideNavComponent implements OnInit {
   endDate: string | null = null;
   tableOfContents: { id: string; text: string }[] = [];
   private dateChangeTimeout: any;
+  isMobile = false;
 
-  constructor(private blogDataService: BlogDataService) {}
+  constructor(
+    private blogDataService: BlogDataService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
-  async ngOnInit() {
-    this.categories = await this.blogDataService.getCategoriesFromServer();
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.checkMobile();
+    }
+  }
+
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.checkMobile();
+    }
+    this.loadCategories();
     if (this.blog) {
       this.generateTableOfContents();
     }
+  }
+
+  private checkMobile() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.isMobile = window.innerWidth <= 768;
+    }
+  }
+
+  private async loadCategories() {
+    this.categories = await this.blogDataService.getCategoriesFromServer();
+  }
+  @Output() mobileMenuToggle = new EventEmitter<boolean>();
+  toggleMobileMenu() {
+    this.isMobileOpen = !this.isMobileOpen;
+    this.mobileMenuToggle.emit(this.isMobileOpen);
+
   }
 
   private generateTableOfContents() {
@@ -83,4 +115,7 @@ export class SideNavComponent implements OnInit {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   }
+
+  
+ 
 }

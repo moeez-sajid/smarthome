@@ -1,32 +1,40 @@
-<div class="side-nav">
-  <div class="categories-section">
-    <div class="header">
-      <h3>Categories</h3>
-      <button class="expand-btn" (click)="toggleExpand()">
-        <svg [class.expanded]="isExpanded" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
-    </div>
+<div class="side-nav" [class.mobile-open]="isMobileOpen">
+  <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle Menu">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
 
-    <div class="categories-list" [class.expanded]="isExpanded">
-      <button 
-        class="view-all" 
-        [class.active]="selectedCategory === null"
-        (click)="selectCategory(null)"
-      >
-        View All
-      </button>
-      <button 
-        *ngFor="let category of categories" 
-        [class.active]="selectedCategory === category._id"
-        (click)="selectCategory(category._id)"
-      >
-        {{ category.name }}
-      </button>
-      
+  <div class="nav-content" [class.mobile-open]="isMobileOpen">
+    <div class="categories-section">
+      <div class="header">
+        <h3>Categories</h3>
+        <button class="expand-btn" (click)="toggleExpand()">
+          <svg [class.expanded]="isExpanded" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <div class="categories-list" [class.expanded]="isExpanded">
+        <button 
+          class="view-all" 
+          [class.active]="selectedCategory === null"
+          (click)="selectCategory(null)"
+        >
+          View All
+        </button>
+        <button 
+          *ngFor="let category of categories" 
+          [class.active]="selectedCategory === category._id"
+          (click)="selectCategory(category._id)"
+        >
+          {{ category.name }}
+        </button>
+      </div>
     </div>
-  </div>
 <!-- 
   <div class="filters-section">
     <h3>Filters</h3>
@@ -67,5 +75,6 @@
         </a>
       </li>
     </ul>
+  </div>
   </div>
 </div>

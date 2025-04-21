@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, Output, EventEmitter, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Blog } from '../../models/blog.model';
@@ -16,7 +16,10 @@ export class TopNavSearchComponent implements OnInit {
   searchResults: Blog[] = [];
   isSearching: boolean = false;
   recentSearches: string[] = [];
+  isMobile = false;
+  @Input() isMobileMenuOpen = false;
   
+  @Output() mobileMenuToggle = new EventEmitter<boolean>();
   private searchSubject = new Subject<string>();
 
   constructor(
@@ -41,6 +44,26 @@ export class TopNavSearchComponent implements OnInit {
     ).subscribe(query => {
       this.performSearch(query);
     });
+
+    if (isPlatformBrowser(this.platformId)) {
+      this.checkMobile();
+      window.addEventListener('resize', () => this.checkMobile());
+    }
+  }
+
+  private checkMobile() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.isMobile = window.innerWidth <= 768;
+      if (!this.isMobile) {
+        this.isMobileMenuOpen = false;
+        this.mobileMenuToggle.emit(false);
+      }
+    }
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    this.mobileMenuToggle.emit(this.isMobileMenuOpen);
   }
 
   onSearchInput(): void {

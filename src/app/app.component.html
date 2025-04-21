@@ -1,8 +1,9 @@
 <div class="app-container">
-  <app-top-nav-search></app-top-nav-search>
+  <app-top-nav-search (mobileMenuToggle)="onMobileMenuToggle($event)" [isMobileMenuOpen]="isMobileMenuOpen"></app-top-nav-search>
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
+  <app-side-nav (mobileMenuToggle)="onMobileMenuToggle($event)" [isMobileOpen]="isMobileMenuOpen"></app-side-nav>
   <app-footer></app-footer>
   <app-newsletter-popup></app-newsletter-popup>
 </div>
