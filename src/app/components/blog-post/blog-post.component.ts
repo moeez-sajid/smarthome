@@ -136,7 +136,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
     if (!this.blog?.contentBlocks) return;
 
     this.sectionHeadings = this.blog.contentBlocks
-      .filter(block => block.type === 'heading' && block.makeTableOfContents)
+      .filter(block => (block.type === 'heading' || block.type === 'h3-heading') && block.makeTableOfContents)
       .map((block, index) => {
         const heading = block.content as { text: string; link?: string };
         return {
