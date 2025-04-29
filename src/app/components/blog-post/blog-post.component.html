@@ -56,7 +56,10 @@
               <h2>{{ heading.text }}</h2>
             </div>
           </ng-container>
-
+          <!-- Heading -->
+          <ng-container *ngIf="block.type === 'h3-heading' && getHeading(block) as heading">
+              <h3 [id]="heading.text" >{{ heading.text }}</h3>
+          </ng-container>
           <!-- Text Break -->
           <div *ngIf="block.type === 'text-break'" class="content-block text-break">
             <hr>
