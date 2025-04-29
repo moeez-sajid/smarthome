@@ -246,7 +246,7 @@ export class BlogPostComponent implements OnInit, AfterViewInit {
 
 // Type-safe helper methods for content blocks
 getHeading(block: ContentBlock): heading | undefined {
-  if (block.type === 'heading' && typeof block.content === 'object') {
+  if ((block.type === 'heading'|| block.type === 'h3-heading') && typeof block.content === 'object') {
     return block.content as heading;
   }
   return undefined;
