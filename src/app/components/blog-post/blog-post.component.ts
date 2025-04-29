@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
 import { BlogDataService } from '../../services/blog-data.service';
 import { Location } from '@angular/common';
 import { SeoService } from '../../services/seo.service';
-import { Blog, ContentBlock } from '../../models/blog.model';
+import { Blog, ContentBlock, htmlContent } from '../../models/blog.model';
 import { Category } from '../../models/category.model';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
@@ -309,6 +309,13 @@ getNumberedList(block: ContentBlock): numberedList | undefined {
 getUnorderedList(block: ContentBlock): unorderedList | undefined {
   if (block.type === 'unordered-list' && typeof block.content === 'object') {
     return block.content as unorderedList;
+  }
+  return undefined;
+}
+
+getRichText(block: ContentBlock): htmlContent | undefined {
+  if (block.type === 'rich-text' && typeof block.content === 'object') {
+    return block.content as htmlContent;
   }
   return undefined;
 }

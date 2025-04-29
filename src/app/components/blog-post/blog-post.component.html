@@ -15,7 +15,7 @@
       <h3>In This Article</h3>
       <ul>
         <li *ngFor="let heading of sectionHeadings;index as i">
-          <a  [ngClass]="{'active': currentSection === heading.id}" (click)="scrollToSection(heading.heading)">
+          <a [ngClass]="{'active': currentSection === heading.id}" (click)="scrollToSection(heading.heading)">
             {{ heading.heading }}
           </a>
         </li>
@@ -169,6 +169,13 @@
               <div [innerHTML]="text.content"></div>
             </div>
           </ng-container>
+          <!-- Rich Text -->
+          <ng-container *ngIf="block.type === 'rich-text' && getRichText(block) as text">
+            <div class="rich-text-block">
+              <div [innerHTML]="text.html"></div>
+            </div>
+          </ng-container>
+
           <!-- Internal Article Link -->
           <ng-container *ngIf="block.type === 'internal-article-link' && getInternalArticleLink(block) as link">
             <div class="content-block internal-article-link">

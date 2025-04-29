@@ -1380,3 +1380,35 @@ cursor: pointer;
     }
   }
 }
+
+.rich-text-block {
+  margin-bottom: 2rem;
+  
+  p {
+    margin: 1rem 0;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 1.5rem 0 1rem;
+    font-weight: bold;
+  }
+
+  ul, ol {
+    padding-left: 2rem;
+    margin: 1rem 0;
+  }
+
+  blockquote {
+    border-left: 4px solid #ccc;
+    margin: 1rem 0;
+    padding-left: 1rem;
+    color: #555;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+}
