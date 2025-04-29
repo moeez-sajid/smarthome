@@ -53,7 +53,7 @@ export interface text {
   format?: 'paragraph' | 'blockquote' | 'pre';
 }
 export interface ContentBlock {
-  type: 'heading' | 'rich-text'| 'text' | 'content-break' | 'text-break' | 'image' | 'video' | 'quote' | 'product' | 'code' | 'comparison-table' | 'numbered-list' | 'unordered-list' | 'product-carousel' | 'recommended-products' | 'internal-article-link' | htmlContent;
+  type: 'heading'| 'h3-heading'  | 'rich-text'| 'text' | 'content-break' | 'text-break' | 'image' | 'video' | 'quote' | 'product' | 'code' | 'comparison-table' | 'numbered-list' | 'unordered-list' | 'product-carousel' | 'recommended-products' | 'internal-article-link' | htmlContent;
   content?: string | heading | ProductItem | ProductItem[] | image | video | quote | comparisonTable | numberedList | unorderedList | internalArticleLink | text | htmlContent;
   makeTableOfContents?: boolean;
 }
