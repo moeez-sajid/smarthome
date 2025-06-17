@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import axios from 'axios';
 import AppServerModule from './src/main.server';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Global cache for blog posts
 let cachedPosts: any = [];
@@ -50,6 +52,21 @@ Sitemap: ${baseUrl}/sitemap.xml`;
     res.send(robotsTxt);
   });
 
+
+  server.get('/ads.txt', (req, res) => {
+    const filePath = path.join(serverDistFolder, 'ads.txt');
+  
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('ads.txt not found', err);
+        res.status(404).send('ads.txt not found');
+      } else {
+        res.set('Content-Type', 'text/plain');
+        res.send(data);
+      }
+    });
+  });
+  
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
     const baseUrl = process.env['BASE_URL'] || 'https://www.smarthometipsguide.com';
