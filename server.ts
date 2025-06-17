@@ -54,13 +54,18 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
 
   server.get('/ads.txt', (req, res) => {
-    const baseUrl = process.env['BASE_URL'] || 'https://www.smarthometipsguide.com';
-    const adsTxt = `google.com, pub-5751962178212406, DIRECT, f08c47fec0942fa0`;
+    const filePath = path.join(serverDistFolder, 'ads.txt');
   
-    res.set('Content-Type', 'text/plain');
-    res.send(adsTxt);
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('ads.txt not found', err);
+        res.status(404).send('ads.txt not found');
+      } else {
+        res.set('Content-Type', 'text/plain');
+        res.send(data);
+      }
+    });
   });
-  
   
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
