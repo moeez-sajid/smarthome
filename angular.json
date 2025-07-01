@@ -38,6 +38,11 @@
                 "input": "public"
               },
               {
+                "glob": "ads.txt",
+                "input": "src/assets",
+                "output": "."
+              },
+              {
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "/assets"
