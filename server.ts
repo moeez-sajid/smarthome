@@ -54,18 +54,35 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
 
   server.get('/ads.txt', (req, res) => {
-    const filePath = path.join(serverDistFolder, 'ads.txt');
+  // Since ads.txt is in assets folder, look in browserDistFolder/assets
+  const filePath = path.join(browserDistFolder, 'assets', 'ads.txt');
   
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error('ads.txt not found', err);
-        res.status(404).send('ads.txt not found');
-      } else {
-        res.set('Content-Type', 'text/plain');
-        res.send(data);
-      }
+  // Check if file exists first
+  if (!fs.existsSync(filePath)) {
+    console.error('ads.txt file not found at:', filePath);
+    res.status(404).send('ads.txt not found');
+    return;
+  }
+
+  try {
+    // Read file synchronously for better error handling
+    const data = fs.readFileSync(filePath, 'utf8');
+    
+    // Set proper headers
+    res.set({
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+      'Content-Length': Buffer.byteLength(data, 'utf8')
     });
-  });
+    
+    res.status(200).send(data);
+    console.log('ads.txt served successfully');
+    
+  } catch (err) {
+    console.error('Error reading ads.txt file:', err);
+    res.status(500).send('Internal server error');
+  }
+});
   
   // Sitemap route
   server.get('/sitemap.xml', (req, res) => {
