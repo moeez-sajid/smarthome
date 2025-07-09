@@ -39,7 +39,11 @@ export function app(): express.Express {
   // Robots.txt route
   server.get('/robots.txt', (req, res) => {
     const baseUrl = process.env['BASE_URL'] || 'https://www.smarthometipsguide.com';
-    const robotsTxt = `User-agent: *
+    const robotsTxt = `
+    User-agent: Googlebot
+Allow: /ads.txt
+    
+    User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
